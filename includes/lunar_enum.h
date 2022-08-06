@@ -3,11 +3,11 @@
 
 #include "lunar.h"
 
-/////////////////////////////////
+//////////////////////////////////
 //
-//			ENUM
+//		ARCHITECTURE MODE
 //
-/////////////////////////////////
+//////////////////////////////////
 
 enum arch_mode_t
 {
@@ -15,8 +15,21 @@ enum arch_mode_t
 	MODE_X64
 };
 
+//////////////////////////////////
+//
+//		MNEMONIC INSTRUCTION
+//			[x86/x64]
+//
+//////////////////////////////////
+
 enum mnemo_idx_t
 {
+			//////////////////////////////////
+			//
+			//			x86 Mnemonic Index
+			//
+			//////////////////////////////////
+			
 			MNEMO_ADD,
 			MNEMO_PUSH,
 			MNEMO_POP,
@@ -657,7 +670,309 @@ enum mnemo_idx_t
 			MNEMO_PADDB,
 			MNEMO_PADDW,
 			MNEMO_PADDD,
-			MNEMO_NULL
+			MNEMO_NULL,
+
+			//////////////////////////////////
+			//
+			//		x64 Bits Mnemonic Index	
+			//
+			//////////////////////////////////
+			
+			MNEMO_REX,
+			MNEMO_REX_B,
+			MNEMO_REX_X,
+			MNEMO_REX_XB,
+			MNEMO_REX_R,
+			MNEMO_REX_RB,
+			MNEMO_REX_RX,
+			MNEMO_REX_RXB,
+			MNEMO_REX_W,
+			MNEMO_REX_WB,
+			MNEMO_REX_WX,
+			MNEMO_REX_WXB,
+			MNEMO_REX_WR,
+			MNEMO_REX_WRB,
+			MNEMO_REX_WRX,
+			MNEMO_REX_WRXB,
+			MNEMO_MOVSXD,
+			MNEMO_FS,
+			MNEMO_GS,
+			MNEMO_CDQE,
+			MNEMO_CQO,
+			MNEMO_PUSHFQ,
+			MNEMO_POPFQ,
+			MNEMO_MOVSQ,
+			MNEMO_CMPSQ,
+			MNEMO_STOSQ,
+			MNEMO_LODSQ,
+			MNEMO_SCASQ,
+			MNEMO_IRETQ,
+			MNEMO_SYSCALL,
+			MNEMO_SYSRET,
+			MNEMO_MOVSHDUP,
+			MNEMO_X64_NULL
+};
+
+enum reg_idx_t
+{
+	//////////////////////////////////
+	//
+	//	[x86/x64] 8 bits registers
+	//		1 byte (BYTE)
+	//
+	//////////////////////////////////
+	
+	REG_AL,
+	REG_CL,
+	REG_DL,
+	REG_BL,
+	REG_AH,
+	REG_SPL = REG_AH,
+	REG_CH,
+	REG_BPL = REG_CH,
+	REG_DH,
+	REG_SIL = REG_DH,
+	REG_BH,
+	REG_DIL = REG_BH,
+	REG_R8L,
+	REG_R9L,
+	REG_R10L,
+	REG_R11L,
+	REG_R12L,
+	REG_R13L,
+	REG_R14L,
+	REG_R15L,
+
+	//////////////////////////////////
+	//
+	//	[x86/x64] 16 bits registers
+	//		2 bytes (WORDS)
+	//
+	//////////////////////////////////
+	
+	REG_AX = 0,
+	REG_CX,
+	REG_DX,
+	REG_BX,
+	REG_SP,
+	REG_BP,
+	REG_SI,
+	REG_DI,
+	REG_R8W,
+	REG_R9W,
+	REG_R10W,
+	REG_R11W,
+	REG_R12W,
+	REG_R13W,
+	REG_R14W,
+	REG_R15W,
+
+	//////////////////////////////////
+	//
+	//	[x86/x64] 32 bits registers
+	//		4 bytes (DWORD)
+	//
+	//////////////////////////////////
+	
+	REG_EAX = 0,
+	REG_ECX,
+	REG_EDX,
+	REG_EBX,
+	REG_ESP,
+	REG_EBP,
+	REG_ESI,
+	REG_EDI,
+	REG_R8D,
+	REG_R9D,
+	REG_R10D,
+	REG_R11D,
+	REG_R12D,
+	REG_R13D,
+	REG_R14D,
+	REG_R15D,
+
+	//////////////////////////////////
+	//
+	//	[x86/x64] 64 bits registers
+	//		8 bytes	(QWORD)
+	//
+	//////////////////////////////////
+	
+	REG_RAX = 0,
+	REG_RCX,
+	REG_RDX,
+	REG_RBX,
+	REG_RSP,
+	REG_RBP,
+	REG_RSI,
+	REG_RDI,
+	REG_R8,
+	REG_R9,
+	REG_R10,
+	REG_R11,
+	REG_R12,
+	REG_R13,
+	REG_R14,
+	REG_R15,
+
+	//////////////////////////////////
+	//
+	//	x87 Extensions Registers
+	//	Floating point registers
+	//		10 bytes registers
+	//
+	//////////////////////////////////
+	
+	REG_ST0 = 0,
+	REG_ST1,
+	REG_ST2,
+	REG_ST3,
+	REG_ST4,
+	REG_ST5,
+	REG_ST6,
+	REG_ST7,
+
+	//////////////////////////////////
+	//
+	//		x64 MMX Registers
+	//	(Single instruction Multiple Data)
+	//
+	//////////////////////////////////
+	
+	REG_MMX0 = 0,
+	REG_MMX1,
+	REG_MMX2,
+	REG_MMX3,
+	REG_MMX4,
+	REG_MMX5,
+	REG_MMX6,
+	REG_MMX7,
+	REG_MMX0_EXT,
+	REG_MMX1_EXT,
+	REG_MMX2_EXT,
+	REG_MMX3_EXT,
+	REG_MMX4_EXT,
+	REG_MMX5_EXT,
+	REG_MMX6_EXT,
+	REG_MMX7_EXT,
+
+	//////////////////////////////////
+	//
+	//	[x86/x64] XMM register 128 bits
+	//
+	//		(DQWORD Register)
+	// Ref : https://stackoverflow.com/questions/44299401/difference-between-mmx-and-xmm-register
+	// 		Use by SSE commonly
+	//
+	//////////////////////////////////
+	
+	REG_XMM0 = 0,
+	REG_XMM1,
+	REG_XMM2,
+	REG_XMM3,
+	REG_XMM4,
+	REG_XMM5,
+	REG_XMM6,
+	REG_XMM7,
+	REG_XMM8,
+	REG_XMM9,
+	REG_XMM10,
+	REG_XMM11,
+	REG_XMM12,
+	REG_XMM13,
+	REG_XMM14,
+	REG_XMM15,
+
+	//////////////////////////////////
+	//
+	//	[x86/x64] YMM Register 256 bits
+	//	Extended XMM register
+	//			Use by AVX
+	//			(DDQWORD)
+	//
+	//////////////////////////////////
+	
+	REG_YMM0 = 0,
+	REG_YMM1,
+	REG_YMM2,
+	REG_YMM3,
+	REG_YMM4,
+	REG_YMM5,
+	REG_YMM6,
+	REG_YMM7,
+	REG_YMM8,
+	REG_YMM9,
+	REG_YMM10,
+	REG_YMM11,
+	REG_YMM12,
+	REG_YMM13,
+	REG_YMM14,
+	REG_YMM15,
+
+	//////////////////////////////////
+	//
+	//	[x86/x64] 16 bits Segment Register
+	//
+	//////////////////////////////////
+	
+	REG_ES = 0,
+	REG_CS,
+	REG_SS,
+	REG_DS,
+	REG_FS,
+	REG_GS,
+	REG_ES_EXT = REG_GS + 2,
+	REG_CS_EXT,
+	REG_SS_EXT,
+	REG_DS_EXT,
+	REG_FS_EXT,
+	REG_GS_EXT,
+
+	//////////////////////////////////
+	//
+	//	[x86/x64] 32 bits Control Register
+	//
+	//////////////////////////////////
+	
+	REG_CR0 = 0,
+	REG_CR1,
+	REG_CR2,
+	REG_CR3,
+	REG_CR4,
+	REG_CR5,
+	REG_CR6,
+	REG_CR7,
+	REG_CR8,
+	REG_CR9,
+	REG_CR10,
+	REG_CR11,
+	REG_CR12,
+	REG_CR13,
+	REG_CR14,
+	REG_CR15,
+
+	//////////////////////////////////
+	//
+	//	[x86/x64] 32 bits Debug Register
+	//
+	//////////////////////////////////
+	
+	REG_DR0 = 0,
+	REG_DR1,
+	REG_DR2,
+	REG_DR3,
+	REG_DR4,
+	REG_DR5,
+	REG_DR6,
+	REG_DR7,
+	REG_DR8,
+	REG_DR9,
+	REG_DR10,
+	REG_DR11,
+	REG_DR12,
+	REG_DR13,
+	REG_DR14,
+	REG_DR15
 };
 
 #endif

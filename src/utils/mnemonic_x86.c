@@ -8,7 +8,21 @@
 
 #include "lunar.h"
 
+//////////////////////////////////
+//
+//	List of [x86] Instructions only
+//
+//////////////////////////////////
+
+
 const mnemonic_t mnemonics32[] = {
+	
+	//////////////////////////////////
+	//
+	//	x86 Mnemonic Instructions
+	//
+	//////////////////////////////////
+	
 	{"ADD",   3},
 	{"PUSH",  4},
 	{"POP",   3},
@@ -683,5 +697,45 @@ const mnemonic_t mnemonics32[] = {
 	{"PADDB",     5},
 	{"PADDW",     5},
 	{"PADDD" ,    5},
-	{NULL, 0}
+	{NULL, 0},
+
+	//////////////////////////////////
+	//
+	//  x64 Mnemonic Instruction
+	//
+	//////////////////////////////////
+
+	{ "REX",      3},
+	{ "REX.B",    5},
+	{ "REX.X",    5},
+	{ "REX.XB",   6},
+	{ "REX.R",    5},
+	{ "REX.RB",   6},
+	{ "REX.RX",   6},
+	{ "REX.RXB",  7},
+	{ "REX.W",    5},
+	{ "REX.WB",   6},
+	{ "REX.WX",   6},
+	{ "REX.WXB",  7},
+	{ "REX.WR",   6},
+	{ "REX.WRB",  7},
+	{ "REX.WRX",  7},
+	{ "REX.WRXB", 8},
+	{ "MOVSXD",   6},
+	{ "FS",       2},
+	{ "GS",       2},
+	{ "CDQE",     4},
+	{ "CQO",      3},
+	{ "PUSHFQ",   6},
+	{ "POPFQ",    5},
+	{ "MOVSQ",    5},
+	{ "CMPSQ",    5},
+	{ "STOSQ",    5},
+	{ "LODSQ",    5},
+	{ "SCASQ",    5},
+	{ "IRETQ",    5},
+	{ "SYSCALL",  7},
+	{ "SYSRET",   6},
+	{ "MOVSHDUP", 8},
+	{ NULL,   0}
 };

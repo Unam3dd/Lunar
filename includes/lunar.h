@@ -16,9 +16,10 @@
 //
 //////////////////////////////////
 
+#define MAX_OPCODES_LENGTH 0xF
 #define GET_VALUE_FIELD(value) ( ((value << 2) & 0xFF ) >> 5 & 0xF)
-
 #define INVALID_REGISTER NULL
+#define REGISTER_ARRAY_SIZE 0x10
 
 //////////////////////////////////
 //
@@ -26,16 +27,17 @@
 //
 //////////////////////////////////
 
-typedef struct register_t	register_t;
-typedef struct opcodes_t	opcodes_t;
-typedef struct mnemonic_t	mnemonic_t;
-typedef struct rex_prfx_t	rex_prfx_t;
-typedef struct mod_rm_t		mod_rm_t;
-typedef struct sib_t    	sib_t;
-typedef struct inst_t 		inst_t;
-typedef struct fmt_t  		fmt_t;
-typedef enum   mnemo_idx_t 	mnemo_idx_t;
-typedef enum   arch_mode_t	arch_mode_t;
+typedef struct 	registers_t	registers_t;
+typedef struct 	opcodes_t	opcodes_t;
+typedef struct 	mnemonic_t	mnemonic_t;
+typedef struct 	rex_prfx_t	rex_prfx_t;
+typedef struct 	mod_rm_t		mod_rm_t;
+typedef struct 	sib_t    	sib_t;
+typedef struct 	inst_t 		inst_t;
+typedef struct 	fmt_t  		fmt_t;
+typedef enum	mnemo_idx_t	mnemo_idx_t;
+typedef enum	reg_idx_t	reg_idx_t;
+typedef enum	arch_mode_t	arch_mode_t;
 
 /////////////////////////////////
 //
@@ -55,14 +57,16 @@ struct mnemonic_t
 //
 /////////////////////////////////
 
-struct register_t
+struct registers_t
 {
-	char	*r8;
+	char	*r8[2];
 	char	*r16;
 	char	*r32;
 	char	*r64;
-	char	*mm;
+	char	*r80;
+	char	*mmx;
 	char	*xmm;
+	char	*ymm;
 	char	*sreg;
 	char	*cr;
 	char	*dr;
@@ -112,7 +116,7 @@ struct opcodes_t
 
 extern const mnemonic_t mnemonics32[];
 extern const mnemonic_t mnemonics64[];
-extern const register_t regs[];
+extern const registers_t regs[];
 extern const opcodes_t opcodes32[];
 extern const opcodes_t opcodes64[];
 
