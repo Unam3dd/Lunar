@@ -144,8 +144,8 @@ struct mod_rm_t
 struct sib_t
 {
 	uint8_t	base	: 3;
-	uint8_t ss 		: 2;
 	uint8_t index	: 3;
+	uint8_t scale 	: 2;
 };
 
 /////////////////////////////////
@@ -155,6 +155,16 @@ struct sib_t
 /////////////////////////////////
 
 struct inst_t
+{
+};
+
+/////////////////////////////////
+//
+//			Formatter
+//
+/////////////////////////////////
+
+struct fmt_t
 {
 };
 
