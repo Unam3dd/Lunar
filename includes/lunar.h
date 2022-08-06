@@ -47,8 +47,8 @@ typedef enum	arch_mode_t	arch_mode_t;
 
 struct mnemonic_t
 {
-	char 	*str;
-	size_t	len;
+	const char 	*str;
+	size_t		len;
 };
 
 /////////////////////////////////
@@ -59,17 +59,17 @@ struct mnemonic_t
 
 struct registers_t
 {
-	char	*r8[2];
-	char	*r16;
-	char	*r32;
-	char	*r64;
-	char	*r80;
-	char	*mmx;
-	char	*xmm;
-	char	*ymm;
-	char	*sreg;
-	char	*cr;
-	char	*dr;
+	const char	*r8[2];
+	const char	*r16;
+	const char	*r32;
+	const char	*r64;
+	const char	*r80;
+	const char	*mmx;
+	const char	*xmm;
+	const char	*ymm;
+	const char	*sreg;
+	const char	*cr;
+	const char	*dr;
 };
 
 /////////////////////////////////
@@ -114,8 +114,7 @@ struct opcodes_t
 //
 //////////////////////////////////
 
-extern const mnemonic_t mnemonics32[];
-extern const mnemonic_t mnemonics64[];
+extern const mnemonic_t mnemonics[];
 extern const registers_t regs[];
 extern const opcodes_t opcodes32[];
 extern const opcodes_t opcodes64[];

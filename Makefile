@@ -4,7 +4,7 @@
 #
 ####################################
 
-NAME		= lunar.a
+NAME		= build/lunar.a
 CC			= @gcc
 CFLAGS		= -Wall -Wextra -Werror -Iincludes -Iincludes -O3
 SRC_C	 	= $(wildcard src/**/*.c)
@@ -64,6 +64,7 @@ BANNER:
 	@$(eval cnt=$(shell echo $$(($(cnt)+1))))
 
 $(NAME): $(OBJ_C)
+	@mkdir -p build
 	@printf "\n"
 	@ar rcs $(NAME) $(OBJ_C)
 
