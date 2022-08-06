@@ -1,0 +1,6 @@
+clang
+-Iincludes/
+-I../includes/
+-I../../includes/
+-I../../../includes/
+-I/usr/include/clang/12/include
