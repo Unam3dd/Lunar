@@ -1,0 +1,1758 @@
+<!DOCTYPE html>
+<html dir="ltr" class="client-js" lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>X86-64 Instruction Encoding - OSDev Wiki</title>
+<meta charset="UTF-8">
+<meta name="generator" content="MediaWiki 1.18.0">
+<link rel="shortcut icon" href="https://wiki.osdev.org/favicon.ico">
+<link rel="search" type="application/opensearchdescription+xml" href="https://wiki.osdev.org/opensearch_desc.php" title="OSDev Wiki (en)">
+<link rel="EditURI" type="application/rsd+xml" href="https://wiki.osdev.org/api.php?action=rsd">
+<link rel="alternate" type="application/atom+xml" title="OSDev Wiki Atom feed" href="https://wiki.osdev.org/index.php?title=Special:RecentChanges&amp;feed=atom">
+<link rel="stylesheet" href="X86-64%20Instruction%20Encoding%20-%20OSDev%20Wiki_fichiers/load.css">
+<style type="text/css" media="all">.mw-collapsible-toggle{float:right} li .mw-collapsible-toggle{float:none} .mw-collapsible-toggle-li{list-style:none}
+
+/* cache key: wikidb:resourceloader:filter:minify-css:4:4250852ed2349a0d4d0fc6509a3e7d4c */
+</style><style type="text/css" media="all">.js-messagebox{margin:1em 5%;padding:0.5em 2.5%;border:1px solid #ccc;background-color:#fcfcfc;font-size:0.8em}.js-messagebox .js-messagebox-group{margin:1px;padding:0.5em 2.5%;border-bottom:1px solid #ddd}.js-messagebox .js-messagebox-group:last-child{border-bottom:thin none transparent}
+
+/* cache key: wikidb:resourceloader:filter:minify-css:4:8b08bdc91c52a9ffba396dccfb5b473c */
+</style><meta name="ResourceLoaderDynamicStyles" content="">
+<link rel="stylesheet" href="X86-64%20Instruction%20Encoding%20-%20OSDev%20Wiki_fichiers/load_002.css">
+<style>a:lang(ar),a:lang(ckb),a:lang(fa),a:lang(kk-arab),a:lang(mzn),a:lang(ps),a:lang(ur){text-decoration:none}a.new,#quickbar a.new{color:#ba0000}
+
+/* cache key: wikidb:resourceloader:filter:minify-css:4:c88e2bcd56513749bec09a7e29cb3ffa */
+</style>
+<script src="X86-64%20Instruction%20Encoding%20-%20OSDev%20Wiki_fichiers/load_006.es"></script><script src="X86-64%20Instruction%20Encoding%20-%20OSDev%20Wiki_fichiers/load.es"></script>
+<script>if(window.mw){
+	mw.config.set({"wgCanonicalNamespace": "", "wgCanonicalSpecialPageName": false, "wgNamespaceNumber": 0, "wgPageName": "X86-64_Instruction_Encoding", "wgTitle": "X86-64 Instruction Encoding", "wgCurRevisionId": 26273, "wgArticleId": 2350, "wgIsArticle": true, "wgAction": "view", "wgUserName": null, "wgUserGroups": ["*"], "wgCategories": ["X86 CPU"], "wgBreakFrames": false, "wgRestrictionEdit": [], "wgRestrictionMove": []});
+}
+</script><script>if(window.mw){
+	mw.loader.load(["mediawiki.page.startup"]);
+}
+</script><script type="text/javascript" src="X86-64%20Instruction%20Encoding%20-%20OSDev%20Wiki_fichiers/load_004.es"></script>
+<!--[if lt IE 7]><style type="text/css">body{behavior:url("/skins/vector/csshover.min.htc")}</style><![endif]--></head>
+<body class="mediawiki ltr sitedir-ltr ns-0 ns-subject page-X86-64_Instruction_Encoding action-view skin-vector">
+		<div id="mw-page-base" class="noprint"></div>
+		<div id="mw-head-base" class="noprint"></div>
+		<!-- content -->
+		<div id="content">
+			<a id="top"></a>
+			<div id="mw-js-message" style="display:none;" class="js-messagebox"></div>
+						<!-- firstHeading -->
+			<h1 id="firstHeading" class="firstHeading">X86-64 Instruction Encoding</h1>
+			<!-- /firstHeading -->
+			<!-- bodyContent -->
+			<div id="bodyContent">
+								<!-- tagline -->
+				<div id="siteSub">From OSDev Wiki</div>
+				<!-- /tagline -->
+								<!-- subtitle -->
+				<div id="contentSub"></div>
+				<!-- /subtitle -->
+																<!-- jumpto -->
+				<div id="jump-to-nav">
+					Jump to: <a href="#mw-head">navigation</a>,
+					<a href="#p-search">search</a>
+				</div>
+				<!-- /jumpto -->
+								<!-- bodycontent -->
+				<div dir="ltr" class="mw-content-ltr" lang="en"><p>This article describes how x86 and x86-64 instructions are encoded.
+</p>
+<table id="toc" class="toc"><tbody><tr><td><div id="toctitle"><h2>Contents</h2><span class="toctoggle">&nbsp;[<a href="#" class="internal" id="togglelink">hide</a>]&nbsp;</span></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="#General_Overview"><span class="tocnumber">1</span> <span class="toctext">General Overview</span></a></li>
+<li class="toclevel-1 tocsection-2"><a href="#Registers"><span class="tocnumber">2</span> <span class="toctext">Registers</span></a></li>
+<li class="toclevel-1 tocsection-3"><a href="#Legacy_Prefixes"><span class="tocnumber">3</span> <span class="toctext">Legacy Prefixes</span></a>
+<ul>
+<li class="toclevel-2 tocsection-4"><a href="#LOCK_prefix"><span class="tocnumber">3.1</span> <span class="toctext">LOCK prefix</span></a></li>
+<li class="toclevel-2 tocsection-5"><a href="#REPNE.2FREPNZ.2C_REP_and_REPE.2FREPZ_prefixes"><span class="tocnumber">3.2</span> <span class="toctext">REPNE/REPNZ, REP and REPE/REPZ prefixes</span></a></li>
+<li class="toclevel-2 tocsection-6"><a href="#CS.2C_SS.2C_DS.2C_ES.2C_FS_and_GS_segment_override_prefixes"><span class="tocnumber">3.3</span> <span class="toctext">CS, SS, DS, ES, FS and GS segment override prefixes</span></a></li>
+<li class="toclevel-2 tocsection-7"><a href="#Branch_taken.2Fnot_taken_prefixes"><span class="tocnumber">3.4</span> <span class="toctext">Branch taken/not taken prefixes</span></a></li>
+<li class="toclevel-2 tocsection-8"><a href="#Operand-size_and_address-size_override_prefix"><span class="tocnumber">3.5</span> <span class="toctext">Operand-size and address-size override prefix</span></a>
+<ul>
+<li class="toclevel-3 tocsection-9"><a href="#NASM"><span class="tocnumber">3.5.1</span> <span class="toctext">NASM</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-10"><a href="#Opcode"><span class="tocnumber">4</span> <span class="toctext">Opcode</span></a>
+<ul>
+<li class="toclevel-2 tocsection-11"><a href="#Legacy_opcodes"><span class="tocnumber">4.1</span> <span class="toctext">Legacy opcodes</span></a>
+<ul>
+<li class="toclevel-3 tocsection-12"><a href="#Mandatory_prefix"><span class="tocnumber">4.1.1</span> <span class="toctext">Mandatory prefix</span></a></li>
+<li class="toclevel-3 tocsection-13"><a href="#REX_prefix"><span class="tocnumber">4.1.2</span> <span class="toctext">REX prefix</span></a>
+<ul>
+<li class="toclevel-4 tocsection-14"><a href="#Usage"><span class="tocnumber">4.1.2.1</span> <span class="toctext">Usage</span></a></li>
+<li class="toclevel-4 tocsection-15"><a href="#Encoding"><span class="tocnumber">4.1.2.2</span> <span class="toctext">Encoding</span></a></li>
+</ul>
+</li>
+<li class="toclevel-3 tocsection-16"><a href="#Opcode_2"><span class="tocnumber">4.1.3</span> <span class="toctext">Opcode</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-17"><a href="#VEX.2FXOP_opcodes"><span class="tocnumber">4.2</span> <span class="toctext">VEX/XOP opcodes</span></a>
+<ul>
+<li class="toclevel-3 tocsection-18"><a href="#Three_byte_VEX_escape_prefix"><span class="tocnumber">4.2.1</span> <span class="toctext">Three byte VEX escape prefix</span></a></li>
+<li class="toclevel-3 tocsection-19"><a href="#Three_byte_XOP_escape_prefix"><span class="tocnumber">4.2.2</span> <span class="toctext">Three byte XOP escape prefix</span></a></li>
+<li class="toclevel-3 tocsection-20"><a href="#Two_byte_VEX_escape_prefix"><span class="tocnumber">4.2.3</span> <span class="toctext">Two byte VEX escape prefix</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-21"><a href="#3DNow.21_opcodes"><span class="tocnumber">4.3</span> <span class="toctext">3DNow! opcodes</span></a>
+<ul>
+<li class="toclevel-3 tocsection-22"><a href="#Fixed_opcode"><span class="tocnumber">4.3.1</span> <span class="toctext">Fixed opcode</span></a></li>
+<li class="toclevel-3 tocsection-23"><a href="#Immediate_opcode_byte"><span class="tocnumber">4.3.2</span> <span class="toctext">Immediate opcode byte</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-24"><a href="#ModR.2FM_and_SIB_bytes"><span class="tocnumber">5</span> <span class="toctext">ModR/M and SIB bytes</span></a>
+<ul>
+<li class="toclevel-2 tocsection-25"><a href="#ModR.2FM"><span class="tocnumber">5.1</span> <span class="toctext">ModR/M</span></a>
+<ul>
+<li class="toclevel-3 tocsection-26"><a href="#16-bit_addressing"><span class="tocnumber">5.1.1</span> <span class="toctext">16-bit addressing</span></a></li>
+<li class="toclevel-3 tocsection-27"><a href="#32.2F64-bit_addressing"><span class="tocnumber">5.1.2</span> <span class="toctext">32/64-bit addressing</span></a>
+<ul>
+<li class="toclevel-4 tocsection-28"><a href="#RIP.2FEIP-relative_addressing"><span class="tocnumber">5.1.2.1</span> <span class="toctext">RIP/EIP-relative addressing</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-29"><a href="#SIB"><span class="tocnumber">5.2</span> <span class="toctext">SIB</span></a>
+<ul>
+<li class="toclevel-3 tocsection-30"><a href="#32.2F64-bit_addressing_2"><span class="tocnumber">5.2.1</span> <span class="toctext">32/64-bit addressing</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-31"><a href="#Displacement"><span class="tocnumber">6</span> <span class="toctext">Displacement</span></a></li>
+<li class="toclevel-1 tocsection-32"><a href="#Immediate"><span class="tocnumber">7</span> <span class="toctext">Immediate</span></a></li>
+<li class="toclevel-1 tocsection-33"><a href="#See_Also"><span class="tocnumber">8</span> <span class="toctext">See Also</span></a>
+<ul>
+<li class="toclevel-2 tocsection-34"><a href="#External_References"><span class="tocnumber">8.1</span> <span class="toctext">External References</span></a></li>
+</ul>
+</li>
+</ul>
+</td></tr></tbody></table>
+<h2> <span class="mw-headline" id="General_Overview"> General Overview </span></h2>
+<p>An x86-64 instruction may be at most 15 bytes in length. It consists 
+of the following components in the given order, where the prefixes are 
+at the least-significant (lowest) address in memory:
+</p>
+<ul><li> <a href="#Legacy_Prefixes">Legacy prefixes</a> (1-4 bytes, optional)
+</li><li> <a href="#Opcode">Opcode with prefixes</a> (1-4 bytes, required)
+</li><li> <a href="#ModR.2FM">ModR/M</a> (1 byte, if required)
+</li><li> <a href="#SIB">SIB</a> (1 byte, if required)
+</li><li> <a href="#Displacement">Displacement</a> (1, 2, 4 or 8 bytes, if required)
+</li><li> <a href="#Immediate">Immediate</a> (1, 2, 4 or 8 bytes, if required)
+</li></ul>
+<h2> <span class="mw-headline" id="Registers"> Registers </span></h2>
+<p>The registers are encoded using the 4-bit values in the X.Reg column of the following table. <i>X.Reg</i> is in binary.
+</p>
+<div style="font-size: smaller">
+<table style="margin-top:1em; margin-bottom:1em; background:#f9f9f9; border:1px #aaa solid; border-collapse:collapse; background: white;" cellspacing="0" cellpadding="4" border="2">
+<tbody><tr>
+<th style="background-color: #f9f9f9"> X.Reg
+</th>
+<th style="background-color: #f9f9f9"> 8-bit GP
+</th>
+<th style="background-color: #f9f9f9"> 16-bit GP
+</th>
+<th style="background-color: #f9f9f9"> 32-bit GP
+</th>
+<th style="background-color: #f9f9f9"> 64-bit GP
+</th>
+<th style="background-color: #f9f9f9"> 80-bit x87
+</th>
+<th style="background-color: #f9f9f9"> 64-bit MMX
+</th>
+<th style="background-color: #f9f9f9"> 128-bit XMM
+</th>
+<th style="background-color: #f9f9f9"> 256-bit YMM
+</th>
+<th style="background-color: #f9f9f9"> 16-bit Segment
+</th>
+<th style="background-color: #f9f9f9"> 32-bit Control
+</th>
+<th style="background-color: #f9f9f9"> 32-bit Debug
+</th></tr>
+<tr>
+<th style="background-color: #f9f9f9"> 0.000 (0)
+</th>
+<td>AL</td>
+<td>AX</td>
+<td>EAX</td>
+<td>RAX</td>
+<td>ST0</td>
+<td>MMX0</td>
+<td>XMM0</td>
+<td>YMM0</td>
+<td>ES</td>
+<td>CR0</td>
+<td>DR0
+</td></tr>
+<tr>
+<th style="background-color: #f9f9f9"> 0.001 (1)
+</th>
+<td>CL</td>
+<td>CX</td>
+<td>ECX</td>
+<td>RCX</td>
+<td>ST1</td>
+<td>MMX1</td>
+<td>XMM1</td>
+<td>YMM1</td>
+<td>CS</td>
+<td>CR1</td>
+<td>DR1
+</td></tr>
+<tr>
+<th style="background-color: #f9f9f9"> 0.010 (2)
+</th>
+<td>DL</td>
+<td>DX</td>
+<td>EDX</td>
+<td>RDX</td>
+<td>ST2</td>
+<td>MMX2</td>
+<td>XMM2</td>
+<td>YMM2</td>
+<td>SS</td>
+<td>CR2</td>
+<td>DR2
+</td></tr>
+<tr>
+<th style="background-color: #f9f9f9"> 0.011 (3)
+</th>
+<td>BL</td>
+<td>BX</td>
+<td>EBX</td>
+<td>RBX</td>
+<td>ST3</td>
+<td>MMX3</td>
+<td>XMM3</td>
+<td>YMM3</td>
+<td>DS</td>
+<td>CR3</td>
+<td>DR3
+</td></tr>
+<tr>
+<th style="background-color: #f9f9f9"> 0.100 (4)
+</th>
+<td>AH, SPL<span style="vertical-align: super"><a href="#Table1Note1">1</a></span></td>
+<td>SP</td>
+<td>ESP</td>
+<td>RSP</td>
+<td>ST4</td>
+<td>MMX4</td>
+<td>XMM4</td>
+<td>YMM4</td>
+<td>FS</td>
+<td>CR4</td>
+<td>DR4
+</td></tr>
+<tr>
+<th style="background-color: #f9f9f9"> 0.101 (5)
+</th>
+<td>CH, BPL<span style="vertical-align: super"><a href="#Table1Note1">1</a></span></td>
+<td>BP</td>
+<td>EBP</td>
+<td>RBP</td>
+<td>ST5</td>
+<td>MMX5</td>
+<td>XMM5</td>
+<td>YMM5</td>
+<td>GS</td>
+<td>CR5</td>
+<td>DR5
+</td></tr>
+<tr>
+<th style="background-color: #f9f9f9"> 0.110 (6)
+</th>
+<td>DH, SIL<span style="vertical-align: super"><a href="#Table1Note1">1</a></span></td>
+<td>SI</td>
+<td>ESI</td>
+<td>RSI</td>
+<td>ST6</td>
+<td>MMX6</td>
+<td>XMM6</td>
+<td>YMM6</td>
+<td>-</td>
+<td>CR6</td>
+<td>DR6
+</td></tr>
+<tr>
+<th style="background-color: #f9f9f9"> 0.111 (7)
+</th>
+<td>BH, DIL<span style="vertical-align: super"><a href="#Table1Note1">1</a></span></td>
+<td>DI</td>
+<td>EDI</td>
+<td>RDI</td>
+<td>ST7</td>
+<td>MMX7</td>
+<td>XMM7</td>
+<td>YMM7</td>
+<td>-</td>
+<td>CR7</td>
+<td>DR7
+</td></tr>
+<tr>
+<th style="background-color: #f9f9f9"> 1.000 (8)
+</th>
+<td>R8L</td>
+<td>R8W</td>
+<td>R8D</td>
+<td>R8</td>
+<td>-</td>
+<td>MMX0</td>
+<td>XMM8</td>
+<td>YMM8</td>
+<td>ES</td>
+<td>CR8</td>
+<td>DR8
+</td></tr>
+<tr>
+<th style="background-color: #f9f9f9"> 1.001 (9)
+</th>
+<td>R9L</td>
+<td>R9W</td>
+<td>R9D</td>
+<td>R9</td>
+<td>-</td>
+<td>MMX1</td>
+<td>XMM9</td>
+<td>YMM9</td>
+<td>CS</td>
+<td>CR9</td>
+<td>DR9
+</td></tr>
+<tr>
+<th style="background-color: #f9f9f9"> 1.010 (10)
+</th>
+<td>R10L</td>
+<td>R10W</td>
+<td>R10D</td>
+<td>R10</td>
+<td>-</td>
+<td>MMX2</td>
+<td>XMM10</td>
+<td>YMM10</td>
+<td>SS</td>
+<td>CR10</td>
+<td>DR10
+</td></tr>
+<tr>
+<th style="background-color: #f9f9f9"> 1.011 (11)
+</th>
+<td>R11L</td>
+<td>R11W</td>
+<td>R11D</td>
+<td>R11</td>
+<td>-</td>
+<td>MMX3</td>
+<td>XMM11</td>
+<td>YMM11</td>
+<td>DS</td>
+<td>CR11</td>
+<td>DR11
+</td></tr>
+<tr>
+<th style="background-color: #f9f9f9"> 1.100 (12)
+</th>
+<td>R12L</td>
+<td>R12W</td>
+<td>R12D</td>
+<td>R12</td>
+<td>-</td>
+<td>MMX4</td>
+<td>XMM12</td>
+<td>YMM12</td>
+<td>FS</td>
+<td>CR12</td>
+<td>DR12
+</td></tr>
+<tr>
+<th style="background-color: #f9f9f9"> 1.101 (13)
+</th>
+<td>R13L</td>
+<td>R13W</td>
+<td>R13D</td>
+<td>R13</td>
+<td>-</td>
+<td>MMX5</td>
+<td>XMM13</td>
+<td>YMM13</td>
+<td>GS</td>
+<td>CR13</td>
+<td>DR13
+</td></tr>
+<tr>
+<th style="background-color: #f9f9f9"> 1.110 (14)
+</th>
+<td>R14L</td>
+<td>R14W</td>
+<td>R14D</td>
+<td>R14</td>
+<td>-</td>
+<td>MMX6</td>
+<td>XMM14</td>
+<td>YMM14</td>
+<td>-</td>
+<td>CR14</td>
+<td>DR14
+</td></tr>
+<tr>
+<th style="background-color: #f9f9f9"> 1.111 (15)
+</th>
+<td>R15L</td>
+<td>R15W</td>
+<td>R15D</td>
+<td>R15</td>
+<td>-</td>
+<td>MMX7</td>
+<td>XMM15</td>
+<td>YMM15</td>
+<td>-</td>
+<td>CR15</td>
+<td>DR15
+</td></tr></tbody></table>
+</div>
+<p><small id="Table1Note1">1: When any REX prefix is used, SPL, BPL, SIL and DIL are used. Otherwise, without any REX prefix AH, CH, DH and BH are used.</small>
+</p>
+<h2> <span class="mw-headline" id="Legacy_Prefixes"> Legacy Prefixes </span></h2>
+<p>Each instruction can have up to four prefixes. Sometimes a prefix is 
+required for the instruction while it loses it's original meaning (i.e. a
+ 'mandatory prefix'). The following prefixes can be used, the order does
+ not matter:
+</p>
+<ul><li> Prefix group 1
+<ul><li> 0xF0: LOCK prefix
+</li><li> 0xF2: REPNE/REPNZ prefix
+</li><li> 0xF3: REP or REPE/REPZ prefix
+</li></ul>
+</li><li> Prefix group 2
+<ul><li> 0x2E: CS segment override
+</li><li> 0x36: SS segment override
+</li><li> 0x3E: DS segment override
+</li><li> 0x26: ES segment override
+</li><li> 0x64: FS segment override
+</li><li> 0x65: GS segment override
+</li><li> 0x2E: Branch not taken
+</li><li> 0x3E: Branch taken
+</li></ul>
+</li><li> Prefix group 3
+<ul><li> 0x66: Operand-size override prefix
+</li></ul>
+</li><li> Prefix group 4
+<ul><li> 0x67: Address-size override prefix
+</li></ul>
+</li></ul>
+<p>When there are two or more prefixes from a single group, the behavior
+ is undefined. Some processors ignore the subsequent prefixes from the 
+same group, or use only the last prefix specified for any group.
+</p>
+<h3> <span class="mw-headline" id="LOCK_prefix"> LOCK prefix </span></h3>
+<p>With the LOCK prefix, certain read-modify-write instructions are 
+executed atomically. The LOCK prefix can only be used with the following
+ instructions or an <a href="https://wiki.osdev.org/Exceptions#Invalid_Opcode" title="Exceptions">Invalid Opcode Exception</a> occurs: ADC, ADD, AND, BTC, BTR, BTS, CMPXCHG, CMPXCHG8B, CMPXCHG16B, DEC, INC, NEG, NOT, OR, SBB, SUB, XADD, XCHG and XOR.
+</p>
+<h3> <span class="mw-headline" id="REPNE.2FREPNZ.2C_REP_and_REPE.2FREPZ_prefixes"> REPNE/REPNZ, REP and REPE/REPZ prefixes </span></h3>
+<p>The repeat prefixes cause string handling instructions to be repeated.
+</p><p>The <b>REP</b> prefix will repeat the associated instruction up 
+to CX times, decreasing CX with every repetition. It can be used with 
+the INS, LODS, MOVS, OUTS and STOS instructions.
+</p><p><b>REPE</b> and <b>REPZ</b> are synonyms and repeat the 
+instruction until CX reaches 0 or when ZF is set to 0. It can be used 
+with the CMPS, CMPSB, CMPSD, CMPSW, SCAS, SCASB, SCASD and SCASW 
+instructions.
+</p><p><b>REPNE</b> and <b>REPNZ</b> also are synonyms and repeat the 
+instruction until CX reaches 0 or when ZF is set to 1. It can be used 
+with the CMPS, CMPSB, CMPSD, CMPSW, SCAS, SCASB, SCASD and SCASW 
+instructions
+</p>
+<h3> <span class="mw-headline" id="CS.2C_SS.2C_DS.2C_ES.2C_FS_and_GS_segment_override_prefixes"> CS, SS, DS, ES, FS and GS segment override prefixes </span></h3>
+<p>Segment overrides are used with instructions that reference non-stack
+ memory. The default segment is implied by the instruction, and using a 
+specific override forces the use of the specified segment for memory 
+operands.
+</p><p>In 64-bit the CS, SS, DS and ES segment overrides are ignored.
+</p>
+<h3> <span class="mw-headline" id="Branch_taken.2Fnot_taken_prefixes"> Branch taken/not taken prefixes </span></h3>
+<p>Branch hints may be used to lessen the impact of branch misprediction
+ somewhat. The 'branch taken' hint is a strong hint, while the 'branch 
+not taken' hint is a weak hint. The branch hints are only supported by 
+Intel since the Pentium 4. Whether using them on AMD architectures has 
+any (positive or negative) effect at all is not known.
+</p>
+<h3> <span class="mw-headline" id="Operand-size_and_address-size_override_prefix"> Operand-size and address-size override prefix </span></h3>
+<p>The default operand-size and address-size can be overridden using these prefix. See the following table:
+</p>
+<table style="margin-top:1em; margin-bottom:1em; background:#f9f9f9; border:1px #aaa solid; border-collapse:collapse; background-color: white" cellspacing="0" cellpadding="4" border="2">
+<tbody><tr>
+<th style="background-color: #f9f9f9"> &nbsp;
+</th>
+<th style="background-color: #f9f9f9"> CS.d
+</th>
+<th style="background-color: #f9f9f9"> REX.W
+</th>
+<th style="background-color: #f9f9f9"> Prefix (0x66 if operand, 0x67 if address)
+</th>
+<th style="background-color: #f9f9f9"> Operand size
+</th>
+<th style="background-color: #f9f9f9"> Address size
+</th></tr>
+<tr>
+<th style="background-color: #f9f9f9" rowspan="2"> Real mode /<br>Virtual 8086 mode
+</th>
+<td> N/A</td>
+<td>N/A</td>
+<td style="background: #ffdddd"> No</td>
+<td>16-bit</td>
+<td>16-bit
+</td></tr>
+<tr>
+<td> N/A</td>
+<td>N/A</td>
+<td style="background: #ddffdd"> Yes</td>
+<td>32-bit</td>
+<td>32-bit
+</td></tr>
+<tr>
+<th style="background-color: #f9f9f9" rowspan="4"> Protected mode /<br>Long compatibility mode
+</th>
+<td style="background: #ffdddd"> 0</td>
+<td>N/A</td>
+<td style="background: #ffdddd"> No</td>
+<td>16-bit</td>
+<td>16-bit
+</td></tr>
+<tr>
+<td style="background: #ffdddd"> 0</td>
+<td>N/A</td>
+<td style="background: #ddffdd"> Yes</td>
+<td>32-bit</td>
+<td>32-bit
+</td></tr>
+<tr>
+<td style="background: #ddffdd"> 1</td>
+<td>N/A</td>
+<td style="background: #ffdddd"> No</td>
+<td>32-bit</td>
+<td>32-bit
+</td></tr>
+<tr>
+<td style="background: #ddffdd"> 1</td>
+<td>N/A</td>
+<td style="background: #ddffdd"> Yes</td>
+<td>16-bit</td>
+<td>16-bit
+</td></tr>
+<tr>
+<th style="background-color: #f9f9f9" rowspan="4"> Long 64-bit mode
+</th>
+<td> Ignored</td>
+<td style="background: #ffdddd"> 0</td>
+<td style="background: #ffdddd"> No</td>
+<td>32-bit</td>
+<td>64-bit
+</td></tr>
+<tr>
+<td> Ignored</td>
+<td style="background: #ffdddd"> 0</td>
+<td style="background: #ddffdd"> Yes</td>
+<td>16-bit</td>
+<td>32-bit
+</td></tr>
+<tr>
+<td> Ignored</td>
+<td style="background: #ddffdd"> 1</td>
+<td style="background: #ffdddd"> No</td>
+<td>64-bit<span style="vertical-align: super"><a href="#Table2Note1">1</a></span></td>
+<td>64-bit
+</td></tr>
+<tr>
+<td> Ignored</td>
+<td style="background: #ddffdd"> 1</td>
+<td style="background: #ddffdd"> Yes</td>
+<td>64-bit</td>
+<td>32-bit
+</td></tr></tbody></table>
+<p><small id="Table2Note1">1: Certain instructions default to (or are fixed at) 64-bit operands and do not need the REX prefix for this, see <a href="#Usage">this table</a>.</small>
+</p>
+<h4> <span class="mw-headline" id="NASM"> NASM </span></h4>
+<p>NASM determines the operand size by looking at the <i>MODRM.reg</i> or (for a register) <i>MODRM.rm</i>
+ fields. When they are both 32-bit, the operand size becomes 32-bit. 
+Same for 16-bit and 64-bit. When they differ, an error occurs at compile
+ time.
+The address size is determined by looking at (for a memory operand) the <i>MODRM.rm</i> field, or the <i>SIB.base</i>, <i>SIB.index</i> and displacement, in that order. So when <i>SIB.base</i>
+ uses a 16-bit register (such as AX), the address size becomes 16-bit. 
+Using a 32-bit displacement will result in the displacement being 
+truncated.
+</p>
+<h2> <span class="mw-headline" id="Opcode"> Opcode </span></h2>
+<p>The x86-64 instruction set defines many opcodes and many ways to encode them, depending on several factors.
+</p>
+<h3> <span class="mw-headline" id="Legacy_opcodes"> Legacy opcodes </span></h3>
+<p>Legacy (and x87) opcodes consist of, in this order:
+</p>
+<ul><li> mandatory prefix;
+</li><li> REX prefix;
+</li><li> opcode.
+</li></ul>
+<h4> <span class="mw-headline" id="Mandatory_prefix"> Mandatory prefix </span></h4>
+<p>Certain instructions (most notably the SIMD instructions) require a 
+mandatory prefix (0x66, 0xF2 or 0xF3), which looks like a normal 
+modifier prefix. When a mandatory prefix is required, it is put with the
+ modifier prefixes before the REX prefix (if any).
+</p>
+<h4> <span class="mw-headline" id="REX_prefix"> REX prefix </span></h4>
+<p>The REX prefix is only available in <a href="https://wiki.osdev.org/Long_Mode" title="Long Mode" class="mw-redirect">long mode</a>.
+</p>
+<h5> <span class="mw-headline" id="Usage"> Usage </span></h5>
+<p>A REX prefix must be encoded when:
+</p>
+<ul><li> using 64-bit operand size and the instruction does not default to 64-bit operand size; or
+</li><li> using one of the extended registers (R8 to R15, XMM8 to XMM15, YMM8 to YMM15, CR8 to CR15 and DR8 to DR15); or
+</li><li> using one of the uniform byte registers SPL, BPL, SIL or DIL.
+</li></ul>
+<p>A REX prefix must not be encoded when:
+</p>
+<ul><li> using one of the high byte registers AH, CH, BH or DH.
+</li></ul>
+<p>In all other cases, the REX prefix is ignored. The use of multiple 
+REX prefixes is undefined, although processors seem to use only the last
+ REX prefix.
+</p><p>Instructions that default to 64-bit operand size in long mode are:
+</p>
+<table style="margin-top:1em; margin-bottom:1em; background:#f9f9f9; border:1px #aaa solid; border-collapse:collapse; {{{1}}}" cellspacing="0" cellpadding="4" border="2">
+
+<tbody><tr>
+<td> CALL (near)</td>
+<td>ENTER</td>
+<td>Jcc
+</td></tr>
+<tr>
+<td> JrCXZ</td>
+<td>JMP (near)</td>
+<td>LEAVE
+</td></tr>
+<tr>
+<td> LGDT</td>
+<td>LIDT</td>
+<td>LLDT
+</td></tr>
+<tr>
+<td> LOOP</td>
+<td>LOOPcc</td>
+<td>LTR
+</td></tr>
+<tr>
+<td> MOV CR(n)</td>
+<td>MOV DR(n)</td>
+<td>POP reg/mem
+</td></tr>
+<tr>
+<td> POP reg</td>
+<td>POP FS</td>
+<td>POP GS
+</td></tr>
+<tr>
+<td> POPFQ</td>
+<td>PUSH imm8</td>
+<td>PUSH imm32
+</td></tr>
+<tr>
+<td> PUSH reg/mem</td>
+<td>PUSH reg</td>
+<td>PUSH FS
+</td></tr>
+<tr>
+<td> PUSH GS</td>
+<td>PUSHFQ</td>
+<td>RET (near)
+</td></tr></tbody></table>
+<h5> <span class="mw-headline" id="Encoding"> Encoding </span></h5>
+<p>The layout is as follows:
+</p>
+<pre>  7                           0
++---+---+---+---+---+---+---+---+
+| 0   1   0   0 | W | R | X | B |
++---+---+---+---+---+---+---+---+
+</pre>
+<table style="margin-top:1em; margin-bottom:1em; background:#f9f9f9; border:1px #aaa solid; border-collapse:collapse; background-color:white;" cellspacing="0" cellpadding="4" border="2">
+<tbody><tr>
+<th style="background-color:#f9f9f9;"> Field
+</th>
+<th style="background-color:#f9f9f9;"> Length
+</th>
+<th style="background-color:#f9f9f9;"> Description
+</th></tr>
+<tr>
+<th style="background-color:#f9f9f9;"> 0100
+</th>
+<td>4 bits</td>
+<td>Fixed bit pattern
+</td></tr>
+<tr>
+<th style="background-color:#f9f9f9;"> W
+</th>
+<td>1 bit</td>
+<td>When 1, a 64-bit operand size is used. Otherwise, when 0, the 
+default operand size is used (which is 32-bit for most but not all 
+instructions, see <a href="#Operand-size_and_address-size_override_prefix">this table</a>).
+</td></tr>
+<tr>
+<th style="background-color:#f9f9f9;"> R
+</th>
+<td>1 bit</td>
+<td>This 1-bit value is an extension to the <i>MODRM.reg</i> field. See <a href="#Registers">Registers</a>.
+</td></tr>
+<tr>
+<th style="background-color:#f9f9f9;"> X
+</th>
+<td>1 bit</td>
+<td>This 1-bit value is an extension to the <i>SIB.index</i> field. See <a href="#64-bit_addressing">64-bit addressing</a>.
+</td></tr>
+<tr>
+<th style="background-color:#f9f9f9;"> B
+</th>
+<td>1 bit</td>
+<td>This 1-bit value is an extension to the <i>MODRM.rm</i> field or the <i>SIB.base</i> field. See <a href="#64-bit_addressing">64-bit addressing</a>.
+</td></tr></tbody></table>
+<p>Because the first four bits always equal 4, the existence of the REX 
+prefix wipes out opcodes 0x40-0x4F, which were previously individual 
+increment and decrement instructions for all eight registers. The Intel 
+64 and IA-32 Architectures
+Software Developer’s Manual volume 2 states "The single-byte-opcode 
+forms of the INC/DEC instructions are not available in 64-bit mode. 
+INC/DEC functionality is still available using ModR/M forms of the same 
+instructions (opcodes FF/0 and FF/1)."
+</p>
+<h4> <span class="mw-headline" id="Opcode_2"> Opcode </span></h4>
+<p>The opcode can be 1, 2 or 3 bytes in length. Depending on the opcode 
+escape sequence, a different opcode map is selected. Possible opcode 
+sequences are:
+</p>
+<ul><li> &lt;op&gt;
+</li><li> 0x0F &lt;op&gt;
+</li><li> 0x0F 0x38 &lt;op&gt;
+</li><li> 0x0F 0x3A &lt;op&gt;
+</li></ul>
+<p>Note that opcodes can specify that the REG field in the ModR/M byte is fixed at a particular value.
+</p>
+<h3> <span class="mw-headline" id="VEX.2FXOP_opcodes"> VEX/XOP opcodes </span></h3>
+<p>A VEX/XOP prefix must be encoded when:
+</p>
+<ul><li> the instruction has only its VEX/XOP opcode and no legacy opcode; or
+</li><li> 256-bit YMM registers are used; or
+</li><li> more than three operands are used (e.g. <i>nondestructive-source operations</i>); or
+</li><li> when using 128-bit XMM destination registers, bits 128-255 of the corresponding YMM register must be cleared.
+</li></ul>
+<p>A VEX/XOP prefix must not be encoded when:
+</p>
+<ul><li> when using 128-bit XMM destination registers, bits 128-255 of the corresponding YMM register must not be changed.
+</li></ul>
+<p><br>
+There are many VEX and XOP instructions, all of which can be encoded 
+using the three byte VEX/XOP escape prefix. The VEX and XOP escape 
+prefixes use fields with the following semantics:
+</p>
+<table style="margin-top:1em; margin-bottom:1em; background:#f9f9f9; border:1px #aaa solid; border-collapse:collapse; background-color:white;" cellspacing="0" cellpadding="4" border="2">
+<tbody><tr>
+<th style="background-color:#f9f9f9;"> Field
+</th>
+<th style="background-color:#f9f9f9;"> Length
+</th>
+<th style="background-color:#f9f9f9;"> Description
+</th></tr>
+<tr>
+<th style="background-color:#f9f9f9; text-align: left; vertical-align: top;"> VEX/XOP prefix
+</th>
+<td style="vertical-align: top;">8 bits</td>
+<td>Prefix.
+<table style="margin-top:1em; margin-bottom:1em; background:#f9f9f9; border:1px #aaa solid; border-collapse:collapse; {{{1}}}" cellspacing="0" cellpadding="4" border="2">
+<tbody><tr>
+<th> Prefix
+</th>
+<th> Opcode map and encoding
+</th></tr>
+<tr>
+<td> 0xC4</td>
+<td>Three-byte VEX
+</td></tr>
+<tr>
+<td> 0xC5</td>
+<td>Two-byte VEX
+</td></tr>
+<tr>
+<td> 0x8F</td>
+<td>Three-byte XOP
+</td></tr></tbody></table>
+</td></tr>
+<tr>
+<th style="background-color:#f9f9f9; text-align: left; vertical-align: top;"> ~R
+</th>
+<td style="vertical-align: top;">1 bit</td>
+<td>This 1-bit value is an 'inverted' extension to the <i>MODRM.reg</i> field. The inverse of REX.R. See <a href="#Registers">Registers</a>.
+</td></tr>
+<tr>
+<th style="background-color:#f9f9f9; text-align: left; vertical-align: top;"> ~X
+</th>
+<td style="vertical-align: top;">1 bit</td>
+<td>This 1-bit value is an 'inverted' extension to the <i>SIB.index</i> field. The inverse of REX.X. See <a href="#64-bit_addressing">64-bit addressing</a>.
+</td></tr>
+<tr>
+<th style="background-color:#f9f9f9; text-align: left; vertical-align: top;"> ~B
+</th>
+<td style="vertical-align: top;">1 bit</td>
+<td>This 1-bit value is an 'inverted' extension to the <i>MODRM.rm</i> field or the <i>SIB.base</i> field. The inverse of REX.B. See <a href="#64-bit_addressing">64-bit addressing</a>.
+</td></tr>
+<tr>
+<th style="background-color:#f9f9f9; text-align: left; vertical-align: top;"> map_select
+</th>
+<td style="vertical-align: top;">5 bits</td>
+<td>Specifies the opcode map to use.
+</td></tr>
+<tr>
+<th style="background-color:#f9f9f9; text-align: left; vertical-align: top;"> W/E
+</th>
+<td style="vertical-align: top;">1 bit</td>
+<td>For integer instructions: when 1, a 64-bit operand size is used; 
+otherwise, when 0, the default operand size is used (equivalent with 
+REX.W). For non-integer instructions, this bit is a general opcode 
+extension bit.
+</td></tr>
+<tr>
+<th style="background-color:#f9f9f9; text-align: left; vertical-align: top;"> ~vvvv
+</th>
+<td style="vertical-align: top;">4 bits</td>
+<td>An additional operand for the instruction. The value of the XMM or YMM register (see <a href="#Registers">Registers</a>) is 'inverted'.
+</td></tr>
+<tr>
+<th style="background-color:#f9f9f9; text-align: left; vertical-align: top;"> L
+</th>
+<td style="vertical-align: top;">1 bit</td>
+<td>When 0, a 128-bit vector lengh is used. Otherwise, when 1, a 256-bit vector length is used.
+</td></tr>
+<tr>
+<th style="background-color:#f9f9f9; text-align: left; vertical-align: top;"> pp
+</th>
+<td style="vertical-align: top;">2 bits</td>
+<td>Specifies an implied mandatory prefix for the opcode.
+<table style="margin-top:1em; margin-bottom:1em; background:#f9f9f9; border:1px #aaa solid; border-collapse:collapse; {{{1}}}" cellspacing="0" cellpadding="4" border="2">
+<tbody><tr>
+<th> Value (binary)
+</th>
+<th> Implied mandatory prefix
+</th></tr>
+<tr>
+<td> 00</td>
+<td>none
+</td></tr>
+<tr>
+<td> 01</td>
+<td>0x66
+</td></tr>
+<tr>
+<td> 10</td>
+<td>0xF3
+</td></tr>
+<tr>
+<td> 11</td>
+<td>0xF2
+</td></tr></tbody></table>
+</td></tr></tbody></table>
+<h4> <span class="mw-headline" id="Three_byte_VEX_escape_prefix"> Three byte VEX escape prefix </span></h4>
+<p>The layout is as follows, starting with a byte with value 0xC4:
+</p>
+<pre>  7                           0       7                           0     7                           0
++---+---+---+---+---+---+---+---+   +---+---+---+---+---+---+---+---+   +---+---+---+---+---+---+---+---+
+| 1   1   0   0   0   1   0   0 |   |~R |~X |~B |     map_select    |   |W/E|     ~vvvv     | L |   pp  |
++---+---+---+---+---+---+---+---+   +---+---+---+---+---+---+---+---+   +---+---+---+---+---+---+---+---+
+</pre>
+<p>A VEX instruction whose values for certain fields are VEX.~X == 1, 
+VEX.~B == 1, VEX.W/E == 0 and map_select == b00001 may be encoded using 
+the <a href="#Two_byte_VEX_escape_prefix">two byte VEX escape prefix</a>.
+</p>
+<h4> <span class="mw-headline" id="Three_byte_XOP_escape_prefix"> Three byte XOP escape prefix </span></h4>
+<p>The layout is the same as the <a href="#Three_byte_VEX_escape_prefix">three-byte VEX escape prefix</a>, but with initial byte value 0x8F:
+</p>
+<pre>  7                           0       7                           0     7                           0
++---+---+---+---+---+---+---+---+   +---+---+---+---+---+---+---+---+   +---+---+---+---+---+---+---+---+
+| 1   0   0   0   1   1   1   1 |   |~R |~X |~B |     map_select    |   |W/E|     ~vvvv     | L |   pp  |
++---+---+---+---+---+---+---+---+   +---+---+---+---+---+---+---+---+   +---+---+---+---+---+---+---+---+
+</pre>
+<p>The AMD64 Architecture Programmer’s Manual Volume 6 states that the 
+map_select field must be equal to or greater than 8, to differentiate 
+the XOP prefix from the POP instruction that formerly used opcode 0x8F.
+</p>
+<h4> <span class="mw-headline" id="Two_byte_VEX_escape_prefix"> Two byte VEX escape prefix </span></h4>
+<p>A VEX instruction whose values for certain fields are VEX.~X == 1, 
+VEX.~B == 1, VEX.W/E == 0 and map_select == b00001 may be encoded using 
+the two byte VEX escape prefix. The layout is as follows:
+</p>
+<pre>  7                           0       7                           0
++---+---+---+---+---+---+---+---+   +---+---+---+---+---+---+---+---+
+| 1   1   0   0   0   1   0   1 |   |~R |     ~vvvv     | L |   pp  |
++---+---+---+---+---+---+---+---+   +---+---+---+---+---+---+---+---+
+</pre>
+<h3> <span class="mw-headline" id="3DNow.21_opcodes"> 3DNow! opcodes </span></h3>
+<p>3DNow! opcodes consist of, in this order:
+</p>
+<ul><li> fixed opcode;
+</li><li> (ModR/M, SIB, displacement);
+</li><li> immediate opcode byte.
+</li></ul>
+<h4> <span class="mw-headline" id="Fixed_opcode"> Fixed opcode </span></h4>
+<p>All 3DNow! opcodes have a fixed two-byte sequence equal to 0x0F 0x0F in the opcode position of the instruction.
+</p>
+<h4> <span class="mw-headline" id="Immediate_opcode_byte"> Immediate opcode byte </span></h4>
+<p>3DNow! instructions encode the actual opcode as an 8-bit immediate 
+value trailing the instruction (thus after the ModR/M, SIB and 
+displacement).
+</p>
+<h2> <span class="mw-headline" id="ModR.2FM_and_SIB_bytes"> ModR/M and SIB bytes </span></h2>
+<p>The ModR/M and SIB bytes are used to encode up to two operands of an 
+instruction, each of which is a direct register or effective memory 
+address.
+</p>
+<h3> <span class="mw-headline" id="ModR.2FM"> ModR/M </span></h3>
+<p>The ModR/M byte encodes a register or an opcode extension, and a register or a memory address. It has the following fields:
+</p>
+<pre>  7                           0
++---+---+---+---+---+---+---+---+
+|  mod  |    reg    |     rm    |
++---+---+---+---+---+---+---+---+
+</pre>
+<table style="margin-top:1em; margin-bottom:1em; background:#f9f9f9; border:1px #aaa solid; border-collapse:collapse; background-color: white" cellspacing="0" cellpadding="4" border="2">
+<tbody><tr>
+<th style="background-color:#f9f9f9;"> Field
+</th>
+<th style="background-color:#f9f9f9;"> Length
+</th>
+<th style="background-color:#f9f9f9;"> Description
+</th></tr>
+<tr>
+<th style="background-color:#f9f9f9; text-align: left; vertical-align: top;"> MODRM.mod
+</th>
+<td style="vertical-align: top;">2 bits</td>
+<td>In general, when this field is b11, then register-direct addressing 
+mode is used; otherwise register-indirect addressing mode is used.
+</td></tr>
+<tr>
+<th style="background-color:#f9f9f9; text-align: left; vertical-align: top;"> MODRM.reg
+</th>
+<td style="vertical-align: top;">3 bits</td>
+<td>This field can have one of two values:
+<ul><li> A 3-bit opcode extension, which is used by some instructions 
+but has no further meaning other than distinguishing the instruction 
+from other instructions.
+</li><li> A 3-bit register reference, which can be used as the source or
+ the destination of an instruction (depending on the instruction). The 
+referenced register depends on the <a href="#Operand-size_and_address-size_override_prefix">operand-size</a> of the instruction and the instruction itself. See <a href="#Registers">Registers</a>
+ for the values to use for each of the registers. The REX.R, VEX.~R or 
+XOP.~R field can extend this field with 1 most-significant bit to 4 bits
+ total.
+</li></ul>
+</td></tr>
+<tr>
+<th style="background-color:#f9f9f9; text-align: left; vertical-align: top;"> MODRM.rm
+</th>
+<td style="vertical-align: top;">3 bits</td>
+<td>Specifies a direct or indirect register operand, optionally with a 
+displacement. The REX.B, VEX.~B or XOP.~B field can extend this field 
+with 1 most-significant bit to 4 bits total.
+</td></tr></tbody></table>
+<h4> <span class="mw-headline" id="16-bit_addressing"> 16-bit addressing </span></h4>
+<p>These are the meanings of the <i>Mod</i> (vertically) and <i>REX/VEX/XOP.B</i> and <i>R/M</i> bits (horizontally) for <a href="#Operand-size_and_address-size_override_prefix">16-bit addressing</a>. <i>B.R/M</i> and <i>Mod</i> are in binary. The SIB-byte is not used in 16-bit addressing. In <i>Long processing mode</i> there is no way to specify 16-bit addresses.
+</p>
+<div style="font-size: 70%; text-align: center">
+<table style="margin-top:1em; margin-bottom:1em; background:#f9f9f9; border:1px #aaa solid; border-collapse:collapse; {{{1}}}" cellspacing="0" cellpadding="4" border="2">
+<tbody><tr>
+<th> 16-bit</th>
+<th colspan="16" style="text-align: left;"> B.R/M
+</th></tr>
+<tr>
+<th> Mod
+</th>
+<th> x.000<br>AX, R8W
+</th>
+<th> x.001<br>CX, R9W
+</th>
+<th> x.010<br>DX, R10W
+</th>
+<th> x.011<br>BX, R11W
+</th>
+<th> x.100<br>SP, R12W
+</th>
+<th> x.101<br>BP, R13W
+</th>
+<th> x.110<br>SI, R14W
+</th>
+<th> x.111<br>DI, R15W
+</th></tr>
+<tr>
+<th> 00
+</th>
+<td style="background-color: white">[BX + SI]
+</td>
+<td style="background-color: white">[BX + DI]
+</td>
+<td style="background-color: white">[BP + SI]
+</td>
+<td style="background-color: white">[BP + DI]
+</td>
+<td style="background-color: white">[SI]
+</td>
+<td style="background-color: white">[DI]
+</td>
+<td style="background-color: white">[disp16]
+</td>
+<td style="background-color: white">[BX]
+</td></tr>
+<tr>
+<th> 01
+</th>
+<td style="background-color: white">[BX + SI + disp8]
+</td>
+<td style="background-color: white">[BX + DI + disp8]
+</td>
+<td style="background-color: white">[BP + SI + disp8]
+</td>
+<td style="background-color: white">[BP + DI + disp8]
+</td>
+<td style="background-color: white">[SI + disp8]
+</td>
+<td style="background-color: white">[DI + disp8]
+</td>
+<td style="background-color: white">[BP + disp8]
+</td>
+<td style="background-color: white">[BX + disp8]
+</td></tr>
+<tr>
+<th> 10
+</th>
+<td style="background-color: white">[BX + SI + disp16]
+</td>
+<td style="background-color: white">[BX + DI + disp16]
+</td>
+<td style="background-color: white">[BP + SI + disp16]
+</td>
+<td style="background-color: white">[BP + DI + disp16]
+</td>
+<td style="background-color: white">[SI + disp16]
+</td>
+<td style="background-color: white">[DI + disp16]
+</td>
+<td style="background-color: white">[BP + disp16]
+</td>
+<td style="background-color: white">[BX + disp16]
+</td></tr>
+<tr>
+<th> 11
+</th>
+<td style="background-color: white" colspan="8">r/m
+</td></tr></tbody></table>
+</div>
+<h4> <span class="mw-headline" id="32.2F64-bit_addressing"> 32/64-bit addressing </span></h4>
+<p>These are the meanings of the <i>Mod</i> (vertically) and <i>REX/VEX/XOP.B</i> and <i>R/M</i> bits (horizontally) for <a href="#Operand-size_and_address-size_override_prefix">32 and 64-bit addressing</a>. <i>B.R/M</i> and <i>Mod</i> are in binary.
+</p>
+<div style="font-size: 70%; text-align: center">
+<table style="margin-top:1em; margin-bottom:1em; background:#f9f9f9; border:1px #aaa solid; border-collapse:collapse; {{{1}}}" cellspacing="0" cellpadding="4" border="2">
+<tbody><tr>
+<th> 32/64-bit</th>
+<th colspan="16" style="text-align: left;"> B.R/M
+</th></tr>
+<tr>
+<th> Mod
+</th>
+<th> 0.000<br>AX
+</th>
+<th> 0.001<br>CX
+</th>
+<th> 0.010<br>DX
+</th>
+<th> 0.011<br>BX
+</th>
+<th> 0.100<br>SP
+</th>
+<th> 0.101<br>BP
+</th>
+<th> 0.110<br>SI
+</th>
+<th> 0.111<br>DI
+</th>
+<th> 1.000<br>R8
+</th>
+<th> 1.001<br>R9
+</th>
+<th> 1.010<br>R10
+</th>
+<th> 1.011<br>R11
+</th>
+<th> 1.100<br>R12
+</th>
+<th> 1.101<br>R13
+</th>
+<th> 1.110<br>R14
+</th>
+<th> 1.111<br>R15
+</th></tr>
+<tr>
+<th> 00
+</th>
+<td style="background-color: white" colspan="4">[r/m]
+</td>
+<td style="background-color: white">[<a href="#SIB">SIB</a>]
+</td>
+<td style="background-color: white">[<a href="#RIP.2FEIP-relative_addressing">RIP/EIP</a><span style="vertical-align: super"><a href="#Table8Note1">1</a>,<a href="#Table8Note2">2</a></span> + disp32]
+</td>
+<td style="background-color: white" colspan="6">[r/m]
+</td>
+<td style="background-color: white">[<a href="#SIB">SIB</a>]
+</td>
+<td style="background-color: white">[<a href="#RIP.2FEIP-relative_addressing">RIP/EIP</a><span style="vertical-align: super"><a href="#Table8Note1">1</a>,<a href="#Table8Note2">2</a></span> + disp32]
+</td>
+<td style="background-color: white" colspan="2">[r/m]
+</td></tr>
+<tr>
+<th> 01
+</th>
+<td style="background-color: white" colspan="4">[r/m + disp8]
+</td>
+<td style="background-color: white">[<a href="#SIB">SIB</a> + disp8]
+</td>
+<td style="background-color: white" colspan="7">[r/m + disp8]
+</td>
+<td style="background-color: white">[<a href="#SIB">SIB</a> + disp8]
+</td>
+<td style="background-color: white" colspan="3">[r/m + disp8]
+</td></tr>
+<tr>
+<th> 10
+</th>
+<td style="background-color: white" colspan="4">[r/m + disp32]
+</td>
+<td style="background-color: white">[<a href="#SIB">SIB</a> + disp32]
+</td>
+<td style="background-color: white" colspan="7">[r/m + disp32]
+</td>
+<td style="background-color: white">[<a href="#SIB">SIB</a> + disp32]
+</td>
+<td style="background-color: white" colspan="3">[r/m + disp32]
+</td></tr>
+<tr>
+<th> 11
+</th>
+<td style="background-color: white" colspan="16">r/m
+</td></tr></tbody></table>
+</div>
+<p><small id="Table8Note1">1: In protected/compatibility mode, this is just <i>disp32</i>, but in long mode this is <i>[RIP]+disp32</i> (for 64-bit addresses) or <i>[EIP]+disp32</i> (for 32-bit addresses, i.e. with address-size override prefix, <a rel="nofollow" class="external text" href="http://objectmix.com/asm-x86-asm-370/69055-effect-address-size-prefix-rip-relative-addressing.html">see here</a>).</small><br>
+<small id="Table8Note2">2: In long mode, to encode <i>disp32</i> as in protected/compatibility mode, use the SIB byte.</small>
+</p>
+<h5> <span class="mw-headline" id="RIP.2FEIP-relative_addressing"> RIP/EIP-relative addressing </span></h5>
+<p>Addressing in x86-64 can be relative to the current instruction pointer value. This is indicated with the <i>RIP</i> (64-bit) and <i>EIP</i>
+ (32-bit) instruction pointer registers, which are not otherwise exposed
+ to the program and may not exist physically. RIP-relative addressing 
+allows object files to be location independent.
+</p>
+<h3> <span class="mw-headline" id="SIB"> SIB </span></h3>
+<p>The SIB byte has the following fields:
+</p>
+<pre>  7                           0
++---+---+---+---+---+---+---+---+
+| scale |   index   |    base   |
++---+---+---+---+---+---+---+---+
+</pre>
+<table style="margin-top:1em; margin-bottom:1em; background:#f9f9f9; border:1px #aaa solid; border-collapse:collapse; background-color: white" cellspacing="0" cellpadding="4" border="2">
+<tbody><tr>
+<th style="background-color:#f9f9f9;"> Field
+</th>
+<th style="background-color:#f9f9f9;"> Length
+</th>
+<th style="background-color:#f9f9f9;"> Description
+</th></tr>
+<tr>
+<th style="background-color:#f9f9f9; text-align: left; vertical-align: top;">SIB.scale
+</th>
+<td style="vertical-align: top;">2 bits</td>
+<td>This field indicates the scaling factor of SIB.index, where <i>s</i> (as used in the tables) equals 2<span style="vertical-align: super;">SIB.scale</span>.
+<table style="margin-top:1em; margin-bottom:1em; background:#f9f9f9; border:1px #aaa solid; border-collapse:collapse; {{{1}}}" cellspacing="0" cellpadding="4" border="2">
+<tbody><tr>
+<th> SIB.scale
+</th>
+<th> factor <i>s</i>
+</th></tr>
+<tr>
+<td> b00</td>
+<td>1
+</td></tr>
+<tr>
+<td> b01</td>
+<td>2
+</td></tr>
+<tr>
+<td> b10</td>
+<td>4
+</td></tr>
+<tr>
+<td> b11</td>
+<td>8
+</td></tr></tbody></table>
+</td></tr>
+<tr>
+<th style="background-color:#f9f9f9; text-align: left; vertical-align: top;">SIB.index
+</th>
+<td style="vertical-align: top;">3 bits</td>
+<td>The index register to use. See <a href="#Registers">Registers</a> 
+for the values to use for each of the registers. The REX.X, VEX.~X or 
+XOP.~X field can extend this field with 1 most-significant bit to 4 bits
+ total.
+</td></tr>
+<tr>
+<th style="background-color:#f9f9f9; text-align: left; vertical-align: top;">SIB.base
+</th>
+<td style="vertical-align: top;">3 bits</td>
+<td>The base register to use. See <a href="#Registers">Registers</a> for
+ the values to use for each of the registers. The REX.B, VEX.~B or 
+XOP.~B field can extend this field with 1 most-significant bit to 4 bits
+ total.
+</td></tr></tbody></table>
+<h4> <span class="mw-headline" id="32.2F64-bit_addressing_2"> 32/64-bit addressing </span></h4>
+<p>The meaning of the SIB byte while using 32 or 64-bit addressing is as follows. The ModR/M byte's <i>Mod</i> field and the SIB byte's <i>index</i> field are used vertically, the SIB byte's <i>base</i> field and REX/VEX/XOP.B bit horizontally. The <i>s</i> is the <a href="#SIB">scaling factor</a>. <i>B.Base</i>, <i>X.Index</i> and <i>Mod</i> are in binary.
+</p>
+<div style="font-size: 70%; text-align: center">
+<table style="margin-top:1em; margin-bottom:1em; background:#f9f9f9; border:1px #aaa solid; border-collapse:collapse; {{{1}}}" cellspacing="0" cellpadding="4" border="2">
+<tbody><tr>
+<th colspan="2"> </th>
+<th colspan="16" style="text-align: left;"> B.Base
+</th></tr>
+<tr>
+<th> Mod
+</th>
+<th style="text-align: left;"> X.Index
+</th>
+<th> 0.000<br>AX
+</th>
+<th> 0.001<br>CX
+</th>
+<th> 0.010<br>DX
+</th>
+<th> 0.011<br>BX
+</th>
+<th> 0.100<br>SP
+</th>
+<th> 0.101<span style="vertical-align: super"><a href="#Table10Note1">1</a></span><br>BP
+</th>
+<th> 0.110<br>SI
+</th>
+<th> 0.111<br>DI
+</th>
+<th> 1.000<br>R8
+</th>
+<th> 1.001<br>R9
+</th>
+<th> 1.010<br>R10
+</th>
+<th> 1.011<br>R11
+</th>
+<th> 1.100<br>R12
+</th>
+<th> 1.101<span style="vertical-align: super"><a href="#Table10Note1">1</a></span><br>R13
+</th>
+<th> 1.110<br>R14
+</th>
+<th> 1.111<br>R15
+</th></tr>
+<tr>
+<th rowspan="16"> 00 </th>
+<th style="text-align: left;"> 0.000 AX
+</th>
+<td style="background-color: white" rowspan="4" colspan="5">[base + (index * s)]
+</td>
+<td style="background-color: white" rowspan="4">[(index * s) + disp32]
+</td>
+<td style="background-color: white" rowspan="4" colspan="7">[base + (index * s)]
+</td>
+<td style="background-color: white" rowspan="4">[(index * s) + disp32]
+</td>
+<td style="background-color: white" rowspan="4" colspan="2">[base + (index * s)]
+</td></tr>
+<tr>
+<th style="text-align: left;"> 0.001 CX
+</th></tr>
+<tr>
+<th style="text-align: left;"> 0.010 DX
+</th></tr>
+<tr>
+<th style="text-align: left;"> 0.011 BX
+</th></tr>
+<tr>
+<th style="text-align: left;"> 0.100<span style="vertical-align: super"><a href="#Table10Note2">2</a></span> SP
+</th>
+<td style="background-color: white" colspan="5">[base]
+</td>
+<td style="background-color: white"> [disp32]
+</td>
+<td style="background-color: white" colspan="7">[base]
+</td>
+<td style="background-color: white"> [disp32]
+</td>
+<td style="background-color: white" colspan="2">[base]
+</td></tr>
+<tr>
+<th style="text-align: left;"> 0.101 BP
+</th>
+<td style="background-color: white" rowspan="11" colspan="5">[base + (index * s)]
+</td>
+<td style="background-color: white" rowspan="11">[(index * s) + disp32]
+</td>
+<td style="background-color: white" rowspan="11" colspan="7">[base + (index * s)]
+</td>
+<td style="background-color: white" rowspan="11">[(index * s) + disp32]
+</td>
+<td style="background-color: white" rowspan="11" colspan="2">[base + (index * s)]
+</td></tr>
+<tr>
+<th style="text-align: left;"> 0.110 SI
+</th></tr>
+<tr>
+<th style="text-align: left;"> 0.111 DI
+</th></tr>
+<tr>
+<th style="text-align: left;"> 1.000 R8
+</th></tr>
+<tr>
+<th style="text-align: left;"> 1.001 R9
+</th></tr>
+<tr>
+<th style="text-align: left;"> 1.010 R10
+</th></tr>
+<tr>
+<th style="text-align: left;"> 1.011 R11
+</th></tr>
+<tr>
+<th style="text-align: left;"> 1.100 R12
+</th></tr>
+<tr>
+<th style="text-align: left;"> 1.101 R13
+</th></tr>
+<tr>
+<th style="text-align: left;"> 1.110 R14
+</th></tr>
+<tr>
+<th style="text-align: left;"> 1.111 R15
+</th></tr>
+<tr>
+<td colspan="18" style="background-color: white; border-top: solid 2px black; border-bottom: solid 2px black; border-left: none; border-right: none;">
+</td></tr>
+<tr>
+<th colspan="2"> </th>
+<th colspan="16" style="text-align: left;"> B.Base
+</th></tr>
+<tr>
+<th> Mod
+</th>
+<th style="text-align: left;"> X.Index
+</th>
+<th> 0.000<br>AX
+</th>
+<th> 0.001<br>CX
+</th>
+<th> 0.010<br>DX
+</th>
+<th> 0.011<br>BX
+</th>
+<th> 0.100<br>SP
+</th>
+<th> 0.101<br>BP
+</th>
+<th> 0.110<br>SI
+</th>
+<th> 0.111<br>DI
+</th>
+<th> 1.000<br>R8
+</th>
+<th> 1.001<br>R9
+</th>
+<th> 1.010<br>R10
+</th>
+<th> 1.011<br>R11
+</th>
+<th> 1.100<br>R12
+</th>
+<th> 1.101<br>R13
+</th>
+<th> 1.110<br>R14
+</th>
+<th> 1.111<br>R15
+</th></tr>
+<tr>
+<th rowspan="16"> 01 </th>
+<th style="text-align: left;"> 0.000 AX
+</th>
+<td style="background-color: white" rowspan="4" colspan="16">[base + (index * s) + disp8]
+</td></tr>
+<tr>
+<th style="text-align: left;"> 0.001 CX
+</th></tr>
+<tr>
+<th style="text-align: left;"> 0.010 DX
+</th></tr>
+<tr>
+<th style="text-align: left;"> 0.011 BX
+</th></tr>
+<tr>
+<th style="text-align: left;"> 0.100<span style="vertical-align: super"><a href="#Table10Note2">2</a></span> SP
+</th>
+<td style="background-color: white" colspan="16">[base + disp8]
+</td></tr>
+<tr>
+<th style="text-align: left;"> 0.101 BP
+</th>
+<td style="background-color: white" rowspan="11" colspan="16">[base + (index * s) + disp8]
+</td></tr>
+<tr>
+<th style="text-align: left;"> 0.110 SI
+</th></tr>
+<tr>
+<th style="text-align: left;"> 0.111 DI
+</th></tr>
+<tr>
+<th style="text-align: left;"> 1.000 R8
+</th></tr>
+<tr>
+<th style="text-align: left;"> 1.001 R9
+</th></tr>
+<tr>
+<th style="text-align: left;"> 1.010 R10
+</th></tr>
+<tr>
+<th style="text-align: left;"> 1.011 R11
+</th></tr>
+<tr>
+<th style="text-align: left;"> 1.100 R12
+</th></tr>
+<tr>
+<th style="text-align: left;"> 1.101 R13
+</th></tr>
+<tr>
+<th style="text-align: left;"> 1.110 R14
+</th></tr>
+<tr>
+<th style="text-align: left;"> 1.111 R15
+</th></tr>
+<tr>
+<td colspan="18" style="background-color: white; border-top: solid 2px black; border-bottom: solid 2px black; border-left: none; border-right: none;">
+</td></tr>
+<tr>
+<th colspan="2"> </th>
+<th colspan="16" style="text-align: left;"> B.Base
+</th></tr>
+<tr>
+<th> Mod
+</th>
+<th style="text-align: left;"> X.Index
+</th>
+<th> 0.000<br>AX
+</th>
+<th> 0.001<br>CX
+</th>
+<th> 0.010<br>DX
+</th>
+<th> 0.011<br>BX
+</th>
+<th> 0.100<br>SP
+</th>
+<th> 0.101<br>BP
+</th>
+<th> 0.110<br>SI
+</th>
+<th> 0.111<br>DI
+</th>
+<th> 1.000<br>R8
+</th>
+<th> 1.001<br>R9
+</th>
+<th> 1.010<br>R10
+</th>
+<th> 1.011<br>R11
+</th>
+<th> 1.100<br>R12
+</th>
+<th> 1.101<br>R13
+</th>
+<th> 1.110<br>R14
+</th>
+<th> 1.111<br>R15
+</th></tr>
+<tr>
+<th rowspan="16"> 10 </th>
+<th style="text-align: left;"> 0.000 AX
+</th>
+<td style="background-color: white" rowspan="4" colspan="16">[base + (index * s) + disp32]
+</td></tr>
+<tr>
+<th style="text-align: left;"> 0.001 CX
+</th></tr>
+<tr>
+<th style="text-align: left;"> 0.010 DX
+</th></tr>
+<tr>
+<th style="text-align: left;"> 0.011 BX
+</th></tr>
+<tr>
+<th style="text-align: left;"> 0.100<span style="vertical-align: super"><a href="#Table10Note2">2</a></span> SP
+</th>
+<td style="background-color: white" colspan="16">[base + disp32]
+</td></tr>
+<tr>
+<th style="text-align: left;"> 0.101 BP
+</th>
+<td style="background-color: white" rowspan="11" colspan="16">[base + (index * s) + disp32]
+</td></tr>
+<tr>
+<th style="text-align: left;"> 0.110 SI
+</th></tr>
+<tr>
+<th style="text-align: left;"> 0.111 DI
+</th></tr>
+<tr>
+<th style="text-align: left;"> 1.000 R8
+</th></tr>
+<tr>
+<th style="text-align: left;"> 1.001 R9
+</th></tr>
+<tr>
+<th style="text-align: left;"> 1.010 R10
+</th></tr>
+<tr>
+<th style="text-align: left;"> 1.011 R11
+</th></tr>
+<tr>
+<th style="text-align: left;"> 1.100 R12
+</th></tr>
+<tr>
+<th style="text-align: left;"> 1.101 R13
+</th></tr>
+<tr>
+<th style="text-align: left;"> 1.110 R14
+</th></tr>
+<tr>
+<th style="text-align: left;"> 1.111 R15
+</th></tr></tbody></table>
+</div>
+<p><small id="Table10Note1">1: No base register is encoded.</small><br>
+<small id="Table10Note2">2: No index register is encoded.</small>
+</p>
+<h2> <span class="mw-headline" id="Displacement"> Displacement </span></h2>
+<p>A displacement value is a 1, 2, 4, or 8 byte offset added to the 
+calculated address. When an 8 byte displacement is used, no immediate 
+operand is encoded.
+</p><p>The displacement value, if any, follows the ModR/M and SIB bytes discussed above. When the ModR/M or SIB tables state that a <i>disp</i> value is required, or without a ModR/M byte the use of <i>moffset</i> (AMD) or <i>moffs</i> (Intel) in the mnemonic syntax of the instruction, then the displacement bytes are required.
+</p>
+<h2> <span class="mw-headline" id="Immediate"> Immediate </span></h2>
+<p>Some instructions require an immediate value. The instruction (and 
+the operand-size column in the above table) determine the length of the 
+immediate value. The <i>imm8</i> mnemonic (or 8-bit <a href="#Operand-size_and_address-size_override_prefix">operand-size</a>) means a one byte immediate value, <i>imm16</i> (or 16-bit operand-size) means a two byte immediate value, <i>imm32</i> (or 32-bit operand-size) a four byte value and <i>imm64</i> (or 64-bit operand-size) an eight byte value. When an 8 byte immediate value is encoded, no displacement can be encoded.
+</p>
+<h2> <span class="mw-headline" id="See_Also"> See Also </span></h2>
+<h3> <span class="mw-headline" id="External_References"> External References </span></h3>
+<ul><li> AMD64 Architecture Programmer's Manual <a rel="nofollow" class="external text" href="https://www.amd.com/system/files/TechDocs/24594.pdf">Volume 3: General-Purpose and System Instructions</a>
+</li><li> <a rel="nofollow" class="external text" href="http://www.intel.com/products/processor/manuals/">Intel 64 and IA-32 Architectures Software Developer's Manuals</a>
+</li></ul>
+
+<!-- 
+NewPP limit report
+Preprocessor node count: 562/1000000
+Post-expand include size: 2770/2097152 bytes
+Template argument size: 141/2097152 bytes
+Expensive parser function count: 0/100
+-->
+
+<!-- Saved in parser cache with key wikidb:pcache:idhash:2350-0!*!0!!en!*!* and timestamp 20220806101138 -->
+</div>				<!-- /bodycontent -->
+								<!-- printfooter -->
+				<div class="printfooter">
+				Retrieved from "<a href="https://wiki.osdev.org/index.php?title=X86-64_Instruction_Encoding&amp;oldid=26273">https://wiki.osdev.org/index.php?title=X86-64_Instruction_Encoding&amp;oldid=26273</a>"				</div>
+				<!-- /printfooter -->
+												<!-- catlinks -->
+				<div id="catlinks" class="catlinks"><div id="mw-normal-catlinks"><a href="https://wiki.osdev.org/Special:Categories" title="Special:Categories">Category</a>: <ul><li><a href="https://wiki.osdev.org/Category:X86_CPU" title="Category:X86 CPU">X86 CPU</a></li></ul></div></div>				<!-- /catlinks -->
+												<div class="visualClear"></div>
+				<!-- debughtml -->
+								<!-- /debughtml -->
+			</div>
+			<!-- /bodyContent -->
+		</div>
+		<!-- /content -->
+		<!-- header -->
+		<div id="mw-head" class="noprint">
+			
+<!-- 0 -->
+<div id="p-personal" class="">
+	<h5>Personal tools</h5>
+	<ul>
+		<li id="pt-login"><a href="https://wiki.osdev.org/index.php?title=Special:UserLogin&amp;returnto=X86-64_Instruction_Encoding" title="You are encouraged to log in; however, it is not mandatory [alt-shift-o]" accesskey="o">Log in</a></li>
+	</ul>
+</div>
+
+<!-- /0 -->
+			<div id="left-navigation">
+				
+<!-- 0 -->
+<div id="p-namespaces" class="vectorTabs">
+	<h5>Namespaces</h5>
+	<ul>
+					<li id="ca-nstab-main" class="selected"><span><a href="https://wiki.osdev.org/X86-64_Instruction_Encoding" title="View the content page [alt-shift-c]" accesskey="c">Page</a></span></li>
+					<li id="ca-talk" class="new"><span><a href="https://wiki.osdev.org/index.php?title=Talk:X86-64_Instruction_Encoding&amp;action=edit&amp;redlink=1" title="Discussion about the content page [alt-shift-t]" accesskey="t">Discussion</a></span></li>
+			</ul>
+</div>
+
+<!-- /0 -->
+
+<!-- 1 -->
+<div id="p-variants" class="vectorMenu emptyPortlet">
+		<h5><span>Variants</span><a href="#"></a></h5>
+	<div class="menu">
+		<ul>
+					</ul>
+	</div>
+</div>
+
+<!-- /1 -->
+			</div>
+			<div id="right-navigation">
+				
+<!-- 0 -->
+<div id="p-views" class="vectorTabs">
+	<h5>Views</h5>
+	<ul>
+					<li id="ca-view" class="selected"><span><a href="https://wiki.osdev.org/X86-64_Instruction_Encoding">Read</a></span></li>
+					<li id="ca-viewsource"><span><a href="https://wiki.osdev.org/index.php?title=X86-64_Instruction_Encoding&amp;action=edit" title="This page is protected.
+You can view its source [alt-shift-e]" accesskey="e">View source</a></span></li>
+					<li id="ca-history" class="collapsible"><span><a href="https://wiki.osdev.org/index.php?title=X86-64_Instruction_Encoding&amp;action=history" title="Past revisions of this page [alt-shift-h]" accesskey="h">View history</a></span></li>
+			</ul>
+</div>
+
+<!-- /0 -->
+
+<!-- 1 -->
+<div id="p-cactions" class="vectorMenu emptyPortlet">
+	<h5><span>Actions</span><a href="#"></a></h5>
+	<div class="menu">
+		<ul>
+					</ul>
+	</div>
+</div>
+
+<!-- /1 -->
+
+<!-- 2 -->
+<div id="p-search">
+	<h5><label for="searchInput">Search</label></h5>
+	<form action="/index.php" id="searchform">
+		<input type="hidden" name="title" value="Special:Search">
+				<input type="search" name="search" title="Search OSDev Wiki [alt-shift-f]" accesskey="f" id="searchInput">		<input type="submit" name="go" value="Go" title="Go to a page with this exact name if exists" id="searchGoButton" class="searchButton">		<input type="submit" name="fulltext" value="Search" title="Search the pages for this text" id="mw-searchButton" class="searchButton">			</form>
+</div>
+
+<!-- /2 -->
+			</div>
+		</div>
+		<!-- /header -->
+		<!-- panel -->
+			<div id="mw-panel" class="noprint">
+				<!-- logo -->
+					<div id="p-logo"><a style="background-image: url(/skins/common/images/osdev.png);" href="https://wiki.osdev.org/Main_Page" title="Visit the main page"></a></div>
+				<!-- /logo -->
+				
+<!-- navigation -->
+<div class="portal" id="p-navigation">
+	<h5>Navigation</h5>
+	<div class="body">
+		<ul>
+			<li id="n-mainpage"><a href="https://wiki.osdev.org/Main_Page" title="Visit the main page [alt-shift-z]" accesskey="z">Main Page</a></li>
+			<li id="n-portal"><a href="http://forum.osdev.org/" rel="nofollow" title="About the project, what you can do, where to find things">Forums</a></li>
+			<li id="n-FAQ"><a href="https://wiki.osdev.org/Category:FAQ">FAQ</a></li>
+			<li id="n-OS-Projects"><a href="https://wiki.osdev.org/Projects">OS Projects</a></li>
+			<li id="n-randompage"><a href="https://wiki.osdev.org/Special:Random" title="Load a random page [alt-shift-x]" accesskey="x">Random page</a></li>
+		</ul>
+	</div>
+</div>
+
+<!-- /navigation -->
+
+<!-- about -->
+<div class="portal" id="p-about">
+	<h5>About</h5>
+	<div class="body">
+		<ul>
+			<li id="n-This-site"><a href="https://wiki.osdev.org/OSDevWiki:About">This site</a></li>
+			<li id="n-Joining"><a href="https://wiki.osdev.org/OSDevWiki:Joining">Joining</a></li>
+			<li id="n-Editing-help"><a href="https://wiki.osdev.org/OSDevWiki:Editing">Editing help</a></li>
+			<li id="n-recentchanges"><a href="https://wiki.osdev.org/Special:RecentChanges" title="A list of recent changes in the wiki [alt-shift-r]" accesskey="r">Recent changes</a></li>
+		</ul>
+	</div>
+</div>
+
+<!-- /about -->
+
+<!-- SEARCH -->
+
+<!-- /SEARCH -->
+
+<!-- TOOLBOX -->
+<div class="portal" id="p-tb">
+	<h5>Toolbox</h5>
+	<div class="body">
+		<ul>
+			<li id="t-whatlinkshere"><a href="https://wiki.osdev.org/Special:WhatLinksHere/X86-64_Instruction_Encoding" title="A list of all wiki pages that link here [alt-shift-j]" accesskey="j">What links here</a></li>
+			<li id="t-recentchangeslinked"><a href="https://wiki.osdev.org/Special:RecentChangesLinked/X86-64_Instruction_Encoding" title="Recent changes in pages linked from this page [alt-shift-k]" accesskey="k">Related changes</a></li>
+			<li id="t-specialpages"><a href="https://wiki.osdev.org/Special:SpecialPages" title="A list of all special pages [alt-shift-q]" accesskey="q">Special pages</a></li>
+			<li><a href="https://wiki.osdev.org/index.php?title=X86-64_Instruction_Encoding&amp;printable=yes" rel="alternate">Printable version</a></li>
+			<li id="t-permalink"><a href="https://wiki.osdev.org/index.php?title=X86-64_Instruction_Encoding&amp;oldid=26273" title="Permanent link to this revision of the page">Permanent link</a></li>
+		</ul>
+	</div>
+</div>
+
+<!-- /TOOLBOX -->
+
+<!-- LANGUAGES -->
+
+<!-- /LANGUAGES -->
+			</div>
+		<!-- /panel -->
+		<!-- footer -->
+		<div id="footer">
+							<ul id="footer-info">
+											<li id="footer-info-lastmod"> This page was last modified on 6 August 2021, at 07:43.</li>
+											<li id="footer-info-viewcount">This page has been accessed 272,247 times.</li>
+									</ul>
+							<ul id="footer-places">
+											<li id="footer-places-privacy"><a href="https://wiki.osdev.org/OSDev_Wiki:Privacy_policy" title="OSDev Wiki:Privacy policy">Privacy policy</a></li>
+											<li id="footer-places-about"><a href="https://wiki.osdev.org/OSDev_Wiki:About" title="OSDev Wiki:About">About OSDev Wiki</a></li>
+											<li id="footer-places-disclaimer"><a href="https://wiki.osdev.org/OSDev_Wiki:General_disclaimer" title="OSDev Wiki:General disclaimer">Disclaimers</a></li>
+									</ul>
+										<ul id="footer-icons" class="noprint">
+					<li id="footer-poweredbyico">
+						<a href="http://www.mediawiki.org/"><img src="X86-64%20Instruction%20Encoding%20-%20OSDev%20Wiki_fichiers/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" width="88" height="31"></a>
+					</li>
+				</ul>
+						<div style="clear:both"></div>
+		</div>
+		<!-- /footer -->
+		<!-- fixalpha -->
+		<script type="text/javascript"> if ( window.isMSIE55 ) fixalpha(); </script>
+		<!-- /fixalpha -->
+		<script src="X86-64%20Instruction%20Encoding%20-%20OSDev%20Wiki_fichiers/load_003.es"></script>
+<script>if(window.mw){
+	mw.loader.load(["mediawiki.user", "mediawiki.util", "mediawiki.page.ready", "mediawiki.legacy.wikibits", "mediawiki.legacy.ajax"]);
+}
+</script><script type="text/javascript" src="X86-64%20Instruction%20Encoding%20-%20OSDev%20Wiki_fichiers/load_005.es"></script>
+<script src="X86-64%20Instruction%20Encoding%20-%20OSDev%20Wiki_fichiers/load_002.es"></script>
+<script>if(window.mw){
+	mw.user.options.set({"ccmeonemails":0,"cols":80,"date":"default","diffonly":0,"disablemail":0,"disablesuggest":0,"editfont":"default","editondblclick":0,"editsection":1,"editsectiononrightclick":0,"enotifminoredits":0,"enotifrevealaddr":0,"enotifusertalkpages":1,"enotifwatchlistpages":0,"extendwatchlist":0,"externaldiff":0,"externaleditor":0,"fancysig":0,"forceeditsummary":0,"gender":"unknown","hideminor":0,"hidepatrolled":0,"highlightbroken":1,"imagesize":2,"justify":0,"math":1,"minordefault":0,"newpageshidepatrolled":0,"nocache":0,"noconvertlink":0,"norollbackdiff":0,"numberheadings":0,"previewonfirst":0,"previewontop":1,"quickbar":5,"rcdays":7,"rclimit":50,"rememberpassword":0,"rows":25,"searchlimit":20,"showhiddencats":0,"showjumplinks":1,"shownumberswatching":1,"showtoc":1,"showtoolbar":1,"skin":"vector","stubthreshold":0,"thumbsize":2,"underline":2,"uselivepreview":0,"usenewrc":0,"watchcreations":0,"watchdefault":0,"watchdeletion":0,"watchlistdays":3,"watchlisthideanons":0,
+	"watchlisthidebots":0,"watchlisthideliu":0,"watchlisthideminor":0,"watchlisthideown":0,"watchlisthidepatrolled":0,"watchmoves":0,"wllimit":250,"variant":"en","language":"en","searchNs0":true,"searchNs1":false,"searchNs2":false,"searchNs3":false,"searchNs4":false,"searchNs5":false,"searchNs6":false,"searchNs7":false,"searchNs8":false,"searchNs9":false,"searchNs10":false,"searchNs11":false,"searchNs12":false,"searchNs13":false,"searchNs14":false,"searchNs15":false});;mw.user.tokens.set({"editToken":"+\\","watchToken":false});;mw.loader.state({"user.options":"ready","user.tokens":"ready"});
+	
+	/* cache key: wikidb:resourceloader:filter:minify-js:4:19a4b18a9ac79a6b8c60b24af4668814 */
+}
+</script><!-- Served in 0.023 secs. -->
+	
+
+</body></html>
