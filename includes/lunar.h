@@ -328,7 +328,7 @@ struct fmt_t
 //
 /////////////////////////////////
 
-int	lunar_decoder_init(inst_t *inst, int arch);
+int		lunar_decoder_init(inst_t *inst, int arch, char *buf);
 
 /////////////////////////////////
 //
@@ -338,6 +338,7 @@ int	lunar_decoder_init(inst_t *inst, int arch);
 
 // prefix.c
 
-int	parse_prefix(inst_t *inst);
+int		parse_prefix(inst_t *inst);
+void	prefix_check_data(prefix_t *p, unsigned char data);
 
 #endif

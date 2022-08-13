@@ -45,9 +45,10 @@ enum prefix_idx_t
 {
 	PREFIX_LOCK 				= 0xF0,
 	PREFIX_REPNE 				= 0xF2,
-	PREFIX_REP	 				= 0xF2,
-	PREFIX_REPE	 				= 0xF2,
-	PREFIX_REPZ	 				= 0xF2,
+	PREFIX_REPNZ				= 0xF2,
+	PREFIX_REP	 				= 0xF3,
+	PREFIX_REPE	 				= 0xF3,
+	PREFIX_REPZ	 				= 0xF3,
 	PREFIX_CS	 				= 0x2E,
 	PREFIX_SS	 				= 0x36,
 	PREFIX_DS	 				= 0x3E,
