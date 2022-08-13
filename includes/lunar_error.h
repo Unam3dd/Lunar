@@ -10,6 +10,15 @@
 typedef struct	lunar_error_t 		lunar_error_t;
 typedef enum	lunar_error_idx_t	lunar_error_idx_t;
 
+//////////////////////////////////
+//
+//			DEFINES
+//
+//////////////////////////////////
+
+#define ERROR_PREFIX_DECODING_MSG 	"during encoding/decoding prefix !"
+#define ERROR_BAD_ARCH_MSG			"Bad architecture, [x86/x64] only !"
+
 /////////////////////////////////
 //
 //			ENUM
@@ -18,8 +27,8 @@ typedef enum	lunar_error_idx_t	lunar_error_idx_t;
 
 enum lunar_error_idx_t
 {
-	ERROR_PREFIX_DECODING = 5051,
-	ERROR_BAD_ARCH
+	ERROR_PREFIX_DECODING_CODE = 5051,
+	ERROR_BAD_ARCH_CODE
 };
 
 /////////////////////////////////
@@ -42,13 +51,12 @@ struct lunar_error_t
 
 extern const lunar_error_t lerror[];
 
-
 /////////////////////////////////
 //
 //			LUNAR ERROR
 //
 /////////////////////////////////
 
-int	lunar_strerror(int code);
+void	lunar_strerror(int code);
 
 #endif

@@ -18,17 +18,21 @@
 int	parse_prefix(inst_t *inst)
 {	
 	unsigned int	prefix_data = 0;
-	size_t	prfx_len = 0, len = 0;
-	int 	cnt = 0, i = 0, j = 0;
+	size_t			prfx_len = 0, len = 0;
+	int 			cnt = 0, i = 0, j = 0;
 
 	if (!inst)
-		return (ERROR_PREFIX_DECODING);
+		return (ERROR_PREFIX_DECODING_CODE);
+
 	prfx_len = strspn(inst->buf.buf, PREFIX_STRING);
 
 	// Instruction must be have max 4 bytes of prefix, more is considered the
 	// behavior is undefined
 	if (prfx_len > 4)
-		return (ERROR_PREFIX_DECODING);
+		return (ERROR_PREFIX_DECODING_CODE);
+
+	if (!prfx_len)
+		return (0);
 
 	// check duplicate prefix group if the instruction contains two or more prefixes of the same group, the instruction has an undefined behavior and is considered as an error.
 	
@@ -42,16 +46,13 @@ int	parse_prefix(inst_t *inst)
 			}
 
 			if (cnt >= 2)
-				return (ERROR_PREFIX_DECODING);
+				return (ERROR_PREFIX_DECODING_CODE);
 		}
 	}
 
 	// Parse value prefix
 
 	prefix_data = *(unsigned int *)inst->buf._buf;
-
-	if (!inst->nprfx)
-		return (0);
 	for (i = 0; i < inst->nprfx; i++)
 		prefix_check_data(&inst->p, ((prefix_data >> (i * 8)) & 0xFF));
 	inst->buf.index += inst->nprfx;

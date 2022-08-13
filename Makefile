@@ -4,7 +4,9 @@
 #
 ####################################
 
-NAME		= build/lunar.a
+DIR			= build/
+OUT			= lunar.a
+NAME		= $(DIR)$(OUT)
 CC			= @gcc
 CFLAGS		= -Wall -Wextra -Werror -Iincludes -O3
 SRC_C	 	= $(wildcard src/**/*.c)
@@ -72,7 +74,7 @@ clean:
 	@rm -rf $(OBJ_C)
 
 fclean: clean
-	@rm -rf $(NAME)
+	@rm -rf $(DIR)
 
 re: fclean all
 
