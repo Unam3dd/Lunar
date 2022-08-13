@@ -11,8 +11,66 @@
 
 enum arch_mode_t
 {
-	MODE_X86,
-	MODE_X64
+	ARCH_MODE_X86,
+	ARCH_MODE_X64
+};
+
+/////////////////////////////////
+//
+//			FLAGS
+//
+/////////////////////////////////
+
+#define NO_SO 0xFF
+
+enum flags_idx_t
+{
+	MODRM		= (1 << 1),
+	REG			= (1 << 2),
+	RM			= (1 << 3),
+	IMM			= (1 << 4),
+	M			= (1 << 5),
+	XMM			= (1 << 6),
+	eFLAGS		= (1 << 7),
+	REAL		= (1 << 8)
+};
+
+/////////////////////////////////
+//
+//			PREFIX ENUM
+//
+/////////////////////////////////
+
+enum prefix_idx_t
+{
+	PREFIX_LOCK 				= 0xF0,
+	PREFIX_REPNE 				= 0xF2,
+	PREFIX_REP	 				= 0xF2,
+	PREFIX_REPE	 				= 0xF2,
+	PREFIX_REPZ	 				= 0xF2,
+	PREFIX_CS	 				= 0x2E,
+	PREFIX_SS	 				= 0x36,
+	PREFIX_DS	 				= 0x3E,
+	PREFIX_ES	 				= 0x26,
+	PREFIX_FS	 				= 0x64,
+	PREFIX_GS	 				= 0x65,
+	PREFIX_BRANCH_NOT_TAKEN		= 0x2E,
+	PREFIX_BRANCH_TAKEN			= 0x3E,
+	PREFIX_OP_SIZE_OVERRIDE		= 0x66,
+	PREFIX_ADDR_SIZE_OVERRIDE 	= 0x67,
+	PREFIX_REX					= 0x40,
+	PREFIX_REX_B,
+	PREFIX_REX_X,
+	PREFIX_REX_XB,
+	PREFIX_REX_R,
+	PREFIX_REX_RB,
+	PREFIX_REX_RX,
+	PREFIX_REX_RXB,
+	PREFIX_REX_W,
+	PREFIX_REX_WB,
+	PREFIX_REX_WRB,
+	PREFIX_REX_WRX,
+	PREFIX_REX_WRXB
 };
 
 //////////////////////////////////

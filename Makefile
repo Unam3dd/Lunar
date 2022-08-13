@@ -6,7 +6,7 @@
 
 NAME		= build/lunar.a
 CC			= @gcc
-CFLAGS		= -Wall -Wextra -Werror -Iincludes -Iincludes -O3
+CFLAGS		= -Wall -Wextra -Werror -Iincludes -O3
 SRC_C	 	= $(wildcard src/**/*.c)
 OBJ_C	 	= $(SRC_C:.c=.o)
 NUM_CF		= $(shell ls -l src/**/*.c | wc -l)
