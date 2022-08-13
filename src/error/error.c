@@ -16,8 +16,8 @@
 /////////////////////////////////
 
 const lunar_error_t	lerror[] = {
-	{ "during encoding/decoding prefix", 5051},
-	{ "bad architecture", 5052 },
+	{ DURING_ENCODING_MSG, DURING_ENCODING_ERR},
+	{ BAD_ARCHITECTURE_MSG, BAD_ARCHITECTURE_ERR},
 	{ NULL, 0 }
 };
 
